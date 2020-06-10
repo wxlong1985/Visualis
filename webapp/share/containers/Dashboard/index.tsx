@@ -151,7 +151,8 @@ interface IDashboardProps {
     dataToken: string,
     requestParams: IDataRequestParams,
     resolve: (data) => void,
-    reject: (data) => void
+    reject: (data) => void,
+    parameters: string
     ) => void,
   onGetProgress: (
     execId: string,
@@ -188,6 +189,7 @@ interface IDashboardProps {
 interface IDashboardStates {
   type: string,
   shareInfo: string
+  parameters: string
   views: {
     [key: string]: Partial<IFormedView>
   }
@@ -209,6 +211,7 @@ export class Share extends React.Component<IDashboardProps, IDashboardStates> {
     this.state = {
       type: '',
       shareInfo: '',
+      parameters: '',
       views: {},
 
       modalLoading: false,
@@ -277,7 +280,8 @@ export class Share extends React.Component<IDashboardProps, IDashboardStates> {
     const qs = this.querystring(location.href.substr(location.href.indexOf('?') + 1))
     this.setState({
       type: qs.type,
-      shareInfo: qs.shareInfo
+      shareInfo: qs.shareInfo,
+      parameters: qs.parameters ? qs.parameters : ''
     })
     this.loadShareContent(qs)
     this.initPolling(qs.shareInfo)
@@ -493,7 +497,7 @@ export class Share extends React.Component<IDashboardProps, IDashboardStates> {
     }, () => {
       this.setState({executeQueryFailed: true})
       return message.error('查询失败！')
-    })
+    }, this.state.parameters)
     // this.getData(this.props.onLoadResultset, renderType, itemId, widgetId, queryConditions)
   }
 
@@ -1361,7 +1365,7 @@ export function mapDispatchToProps (dispatch) {
     onGetBaseInfo: (resolve) => dispatch(getBaseInfo(resolve)),
     onLoadResultset: (renderType, itemid, dataToken, requestParams) => dispatch(getResultset(renderType, itemid, dataToken, requestParams)),
     // widget页面 提交查询数据接口
-    onExecuteQuery: (renderType, itemid, dataToken, requestParams, resolve, reject) => dispatch(executeQuery(renderType, itemid, dataToken, requestParams, resolve, reject)),
+    onExecuteQuery: (renderType, itemid, dataToken, requestParams, resolve, reject, parameters) => dispatch(executeQuery(renderType, itemid, dataToken, requestParams, resolve, reject, parameters)),
     // widget页面 进度查询接口
     onGetProgress: (execId, resolve, reject) => dispatch(getProgress(execId, resolve, reject)),
     // widget页面 获取结果集接口

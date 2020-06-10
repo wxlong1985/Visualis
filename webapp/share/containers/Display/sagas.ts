@@ -116,8 +116,8 @@ export function* getData (action: ShareDisplayActionType) {
 
 export function* executeQuery (action: ShareDisplayActionType) {
   if (action.type !== ActionTypes.EXECUTE_QUERY) { return }
-
-  const { renderType, layerId, dataToken, requestParams, resolve, reject } = action.payload
+  const { payload } = action
+  const { renderType, layerId, dataToken, requestParams, resolve, reject } = payload
   const {
     filters,
     tempFilters,
@@ -133,9 +133,10 @@ export function* executeQuery (action: ShareDisplayActionType) {
   const { executeQueryLoaded, loadExecuteQUeryFail } = ShareDisplayActions
 
   try {
+    const url = payload.parameters ? `${api.share}/data/${dataToken}?parameters=${payload.parameters}` : `${api.share}/data/${dataToken}`
     const asyncData = yield call(request, {
       method: 'post',
-      url: `${api.share}/data/${dataToken}`,
+      url,
       data: {
         ...omit(rest, 'customOrders'),
         filters: filters.concat(tempFilters).concat(linkageFilters).concat(globalFilters),

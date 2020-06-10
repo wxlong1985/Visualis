@@ -81,7 +81,7 @@ export const ShareDisplayActions = {
       }
     }
   },
-  executeQuery (renderType, layerId, dataToken, requestParams, resolve, reject) {
+  executeQuery (renderType, layerId, dataToken, requestParams, resolve, reject, parameters) {
     return {
       type: ActionTypes.EXECUTE_QUERY,
       payload: {
@@ -90,7 +90,8 @@ export const ShareDisplayActions = {
         dataToken,
         requestParams,
         resolve,
-        reject
+        reject,
+        parameters
       }
     }
   },

@@ -93,8 +93,9 @@ interface IDisplayProps extends RouteComponentProps<{}, {}> {
     dataToken: string,
     requestParams: IDataRequestParams,
     resolve: (data) => void,
-    reject: (data) => void
-  ) => void
+    reject: (data) => void,
+    parameters: string
+    ) => void
   onGetProgress: (
     execId: string,
     resolve: (data) => void,
@@ -116,6 +117,7 @@ interface IDisplayStates {
   scale: [number, number]
   showLogin: boolean
   shareInfo: string
+  parameters: string
   headlessBrowserRenderSign: boolean
   executeQueryFailed: boolean
 }
@@ -131,19 +133,21 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
       scale: [1, 1],
       showLogin: false,
       shareInfo: '',
+      parameters: '',
       headlessBrowserRenderSign: false,
       executeQueryFailed: false
     }
   }
 
   public componentWillMount () {
-    const { shareInfo } = this.props.location.query
+    const { shareInfo, parameters } = this.props.location.query
     this.props.onGetBaseInfo(result => {
       const { userInfo } = result
       if (userInfo && userInfo.basic) localStorage.setItem('username', userInfo.basic.username)
     })
     this.setState({
-      shareInfo
+      shareInfo,
+      parameters: parameters ? parameters : ''
     }, () => {
       this.loadShareContent()
     })
@@ -337,7 +341,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
     }, () => {
       this.setState({executeQueryFailed: true})
       return message.error('查询失败！')
-    })
+    }, this.state.parameters)
   }
 
   private timeout = []
@@ -548,7 +552,7 @@ export function mapDispatchToProps (dispatch) {
     onLoadDisplay: (token, resolve, reject) => dispatch(loadDisplay(token, resolve, reject)),
     onGetBaseInfo: (resolve) => dispatch(getBaseInfo(resolve)),
     onLoadLayerData: (renderType, layerId, dataToken, requestParams) => dispatch(loadLayerData(renderType, layerId, dataToken, requestParams)),
-    onExecuteQuery: (renderType, layerId, dataToken, requestParams, resolve, reject) => dispatch(executeQuery(renderType, layerId, dataToken, requestParams, resolve, reject)),
+    onExecuteQuery: (renderType, layerId, dataToken, requestParams, resolve, reject, parameters) => dispatch(executeQuery(renderType, layerId, dataToken, requestParams, resolve, reject, parameters)),
     onGetProgress: (execId, resolve, reject) => dispatch(getProgress(execId, resolve, reject)),
     onGetResult: (execId, renderType, layerId, dataToken, requestParams, resolve, reject) => dispatch(getResult(execId, renderType, layerId, dataToken, requestParams, resolve, reject))
   }

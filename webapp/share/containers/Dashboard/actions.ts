@@ -142,7 +142,7 @@ export function getResultsetFail (itemId, errorMessage) {
     }
   }
 }
-export function executeQuery (renderType, itemId, dataToken, requestParams, resolve, reject) {
+export function executeQuery (renderType, itemId, dataToken, requestParams, resolve, reject, parameters) {
   return {
     type: EXECUTE_QUERY,
     payload: {
@@ -151,7 +151,8 @@ export function executeQuery (renderType, itemId, dataToken, requestParams, reso
       dataToken,
       requestParams,
       resolve,
-      reject
+      reject,
+      parameters
     }
   }
 }

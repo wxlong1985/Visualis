@@ -172,9 +172,10 @@ export function* executeQuery (action) {
   const { pageSize, pageNo } = pagination || { pageSize: 0, pageNo: 0 }
 
   try {
+    const url = payload.parameters ? `${api.share}/data/${dataToken}?parameters=${payload.parameters}` : `${api.share}/data/${dataToken}`
     const asyncData = yield call(request, {
       method: 'post',
-      url: `${api.share}/data/${dataToken}`,
+      url,
       data: {
         ...omit(rest, 'customOrders'),
         filters: filters.concat(tempFilters).concat(linkageFilters).concat(globalFilters),
