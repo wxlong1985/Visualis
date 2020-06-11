@@ -142,8 +142,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
   public componentWillMount () {
     const { shareInfo, parameters } = this.props.location.query
     this.props.onGetBaseInfo(result => {
-      const { userInfo } = result
-      if (userInfo && userInfo.basic) localStorage.setItem('username', userInfo.basic.username)
+      localStorage.setItem('username', result.username)
     })
     this.setState({
       shareInfo,

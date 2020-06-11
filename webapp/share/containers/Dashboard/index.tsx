@@ -273,8 +273,7 @@ export class Share extends React.Component<IDashboardProps, IDashboardStates> {
   }
   public componentWillMount () {
     this.props.onGetBaseInfo(result => {
-      const { userInfo } = result
-      if (userInfo && userInfo.basic) localStorage.setItem('username', userInfo.basic.username)
+      localStorage.setItem('username', result.username)
     })
     // urlparse
     const qs = this.querystring(location.href.substr(location.href.indexOf('?') + 1))

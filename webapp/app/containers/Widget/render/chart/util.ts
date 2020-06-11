@@ -444,7 +444,6 @@ export function makeGrouped (data, groupColumns, xAxisColumn, metrics, xAxisData
     }
     grouped[groupingKey][colKey].push(d)
   })
-
   const colKeys = Array.from(colKeySet)
   Object.keys(grouped).map((groupingKey) => {
     const currentGroupValues = grouped[groupingKey]
@@ -460,7 +459,7 @@ export function makeGrouped (data, groupColumns, xAxisColumn, metrics, xAxisData
           })
         }
       })
-      : [currentGroupValues['default'][0]]
+      : currentGroupValues['default'] ? [currentGroupValues['default'][0]] : currentGroupValues[0]
   })
 
   return grouped

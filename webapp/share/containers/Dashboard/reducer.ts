@@ -324,7 +324,6 @@ function shareReducer (state = initialState, { type, payload }) {
         }
       })
     case GET_RESULT_SUCCESS:
-      console.log('reducer GET_RESULT_SUCCESS payload: ', payload)
       fieldGroupedSort(payload.resultset.resultList, payload.requestParams.customOrders)
       return state.set('itemsInfo', {
         ...itemsInfo,
@@ -337,7 +336,6 @@ function shareReducer (state = initialState, { type, payload }) {
         }
       })
     case GET_RESULT_FAILURE:
-      console.log('reducer GET_RESULT_FAILURE payload: ', payload)
       return state.set('itemsInfo', {
         ...itemsInfo,
         [payload.itemId]: {
