@@ -185,14 +185,17 @@ export class LayerItem extends React.PureComponent<ILayerItemProps, ILayerItemSt
   }
 
   public componentDidUpdate () {
-    const rect = (findDOMNode(this.refLayer) as Element).getBoundingClientRect()
-    const { top, height, right } = rect
-    const [ x, y ] = this.state.layerTooltipPosition
-    const [newX, newY] = [top + height / 2, right]
-    if (x !== newX || y !== newY) {
-      this.setState({
-        layerTooltipPosition: [newX, newY]
-      })
+    const element = findDOMNode(this.refLayer) as Element
+    if (element) {
+      const rect = element.getBoundingClientRect()
+      const { top, height, right } = rect
+      const [ x, y ] = this.state.layerTooltipPosition
+      const [newX, newY] = [top + height / 2, right]
+      if (x !== newX || y !== newY) {
+        this.setState({
+          layerTooltipPosition: [newX, newY]
+        })
+      }
     }
   }
 
