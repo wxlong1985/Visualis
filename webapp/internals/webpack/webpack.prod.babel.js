@@ -6,6 +6,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin')
 
 module.exports = require('./webpack.base.babel')({
   mode: 'production',
@@ -146,7 +147,35 @@ module.exports = require('./webpack.base.babel')({
       statsFilename: '../stats.json',
       statsOptions: null,
       logLevel: 'info'
-    })
+    }),
+    new CspHtmlWebpackPlugin(
+      {
+        'base-uri': "'self'",
+        'object-src': "'none'",
+        'child-src': "'none'",
+        'script-src': ["'self'","'unsafe-inline'","'unsafe-eval'"],
+        'style-src': ["'self'","'unsafe-inline'"],
+        'connect-src': [
+          "'self'"
+        ],
+        'img-src': [
+          "'self'",
+          'data:'
+        ]
+      },
+      {
+        enabled: true,
+        hashingMethod: 'sha256',
+        hashEnabled: {
+          'script-src': true,
+          'style-src': false
+        },
+        nonceEnabled: {
+          'script-src': true,
+          'style-src': false
+        }
+      }
+    )
   ],
 
   performance: {

@@ -149,6 +149,7 @@
     "compare-versions": "3.4.0",
     "compression-webpack-plugin": "2.0.0",
     "coveralls": "3.0.2",
+    "csp-html-webpack-plugin": "^4.0.0",
     "css-loader": "1.0.0",
     "default-passive-events": "^1.0.10",
     "enzyme": "3.7.0",
