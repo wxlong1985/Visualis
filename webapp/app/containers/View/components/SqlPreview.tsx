@@ -112,7 +112,7 @@ export class SqlPreview extends React.PureComponent<ISqlPreviewProps, ISqlPrevie
 
     const username = localStorage.getItem('username');
     const waterMaskProps = {
-      text: `由DataSphere Studio生成，仅供内部参考，严禁对外分享-${username}`,
+      text: `${username}`,
     }
 
     return (

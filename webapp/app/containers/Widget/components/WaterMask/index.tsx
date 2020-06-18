@@ -41,7 +41,7 @@ class WaterMask extends React.Component<WaterMaskProps, WaterMaskState, {}>{
     }
     generateSingle(text) {
         const w = 400;
-        const h = 100;
+        const h = 400;
         this.single.width = w;
         this.single.height =h;
         this.single.style.width  = w + 'px';
