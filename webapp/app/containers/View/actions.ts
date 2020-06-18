@@ -430,6 +430,8 @@ export const ViewActions = {
   
   getResult (
     execId: string,
+    pageNo: number,
+    pageSize: number,
     resolve: (data: any[]) => void,
     reject: (error) => void
   ) {
@@ -437,6 +439,8 @@ export const ViewActions = {
       type: ActionTypes.GET_RESULT,
       payload: {
         execId,
+        pageNo,
+        pageSize,
         resolve,
         reject
       }

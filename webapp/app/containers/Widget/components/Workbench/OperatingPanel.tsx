@@ -113,7 +113,7 @@ interface IOperatingPanelProps {
   // widget页面 进度查询接口
   onGetProgress: (execId: string, resolve: (data) => void, reject: (error) => void) => void
   // widget页面 获取结果集接口
-  onGetResult: (execId: string, resolve: (data) => void, reject: (error) => void) => void
+  onGetResult: (execId: string, pageNo: number, pageSize: number, resolve: (data) => void, reject: (error) => void) => void
   // widget页面 进度查询接口
   onKillExecute: (execId: string, resolve: (data) => void, reject: (error) => void) => void
   onSetQueryData: (data: object) => void
@@ -949,7 +949,9 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
         return message.error('查询失败！')
       } else if (status === 'Succeed' && progress === 1) {
         // 查询成功，调用 结果集接口，status为success时，progress一定为1
-        onGetResult(execId, (result) => {
+        const pageNoReal = updatedPagination && updatedPagination.pageNo ? updatedPagination.pageNo : 0
+        const pageSizeReal = updatedPagination && updatedPagination.pageSize ? updatedPagination.pageSize : 0
+        onGetResult(execId, pageNoReal, pageSizeReal, (result) => {
           // 后续一样，执行数据显示的逻辑
           const { resultList: data, pageNo, pageSize, totalCount } = result
           updatedPagination = !updatedPagination.withPaging ? updatedPagination : {

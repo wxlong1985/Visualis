@@ -367,14 +367,7 @@ export class Table extends React.PureComponent<IChartProps, ITableStates> {
     }
     // 如果cols和rows和metrics此时都为空，说明不可能有数据，props中的data可能是残留的没更新的数据，所以要加个这样的判断，如果cols和rows和metrics此时都为空，则不显示分页组件
     const emptyData = cols && cols.length === 0 && rows && rows.length === 0 && cols && cols.length === 0
-    // 不显示总条数的分页
-    const paginationWithoutTotal = withPaging && tablePagination.total === -1 && !emptyData ? (
-      <PaginationWithoutTotal
-        dataLength={data.length}
-        size="small"
-        {...paginationConfig}
-      />
-    ) : null
+
     // 表格的类名
     const tableCls = classnames({
       [Styles.table]: true,
@@ -421,14 +414,14 @@ export class Table extends React.PureComponent<IChartProps, ITableStates> {
           components={tableComponents}
           // 列的配置
           columns={adjustedTableColumns}
-          pagination={withPaging && tablePagination.total !== -1 ? paginationConfig : false}
           scroll={scroll}
           bordered={bordered}
           rowClassName={this.setRowClassName}
           onRowClick={this.rowClick}
           onChange={this.tableChange}
+          // 使用了额外的paginationWithoutTotal了，就不用表格原生的分页组件了
+          pagination={withPaging && tablePagination.total !== -1 ? paginationConfig : false}
         />
-        {paginationWithoutTotal}
       </>
     )
   }
@@ -747,7 +740,7 @@ function getPaginationOptions (props: IChartProps) {
     current: pageNo,
     pageSize: pageSize || +initialPageSize,
     total: totalCount,
-    simple: true
+    simple: false
   }
   return paginationOptions
 }

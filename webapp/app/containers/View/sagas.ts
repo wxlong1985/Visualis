@@ -262,13 +262,16 @@ export function* getProgress (action: ViewActionType) {
 
 export function* getResult (action: ViewActionType) {
   if (action.type !== ActionTypes.GET_RESULT) { return }
-  const { execId, resolve, reject } = action.payload
+  const { execId, pageNo, pageSize, resolve, reject } = action.payload
   const { getResultLoaded, loadGetResultFail } = ViewActions
   try {
     const asyncData = yield call(request, {
       method: 'post',
       url: `${api.view}/${execId}/getresult`,
-      data: {}
+      data: {
+        pageNo,
+        pageSize
+      }
     })
     yield put(getResultLoaded())
     // asyncData.payload可能为""

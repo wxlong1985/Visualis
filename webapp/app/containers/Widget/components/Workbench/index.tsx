@@ -79,7 +79,7 @@ interface IWorkbenchProps {
   // widget页面 进度查询接口
   onGetProgress: (execId: string, resolve: (data) => void, reject: (error) => void) => void
   // widget页面 获取结果集接口
-  onGetResult: (execId: string, resolve: (data) => void, reject: (error) => void) => void
+  onGetResult: (execId: string, pageNo: number, pageSize: number, resolve: (data) => void, reject: (error) => void) => void
   // widget页面 kill查询接口
   onKillExecute: (execId: string, resolve: (data) => void, reject: (error) => void) => void
   onAddWidget: (widget: IWidget, resolve: () => void) => void
@@ -931,7 +931,7 @@ export function mapDispatchToProps (dispatch) {
     // widget页面 进度查询接口
     onGetProgress: (execId, resolve, reject) => dispatch(getProgress(execId, resolve, reject)),
     // widget页面 获取结果集接口
-    onGetResult: (execId, resolve, reject) => dispatch(getResult(execId, resolve, reject)),
+    onGetResult: (execId, pageNo, pageSize, resolve, reject) => dispatch(getResult(execId, pageNo, pageSize, resolve, reject)),
     // widget页面 kill查询接口
     onKillExecute: (execId, resolve, reject) => dispatch(killExecute(execId, resolve, reject)),
     onAddWidget: (widget, resolve) => dispatch(addWidget(widget, resolve)),

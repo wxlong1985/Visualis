@@ -258,7 +258,7 @@ export class Widget extends React.Component<
     }
 
     return (
-      <div className={styles.wrapper} ref={this.container} id="widget" style={{overflow: 'auto'}}>
+      <div className={styles.wrapper} ref={this.container} id="widget" style={{overflowX: 'auto', overflowY: 'hidden'}}>
         <WaterMask {...waterMaskProps} />
         {widgetContent}
         {loading}
