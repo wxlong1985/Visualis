@@ -351,7 +351,6 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
     let globalVariables
     let pagination
     let nativeQuery
-
     if (queryConditions) {
       tempFilters = queryConditions.tempFilters !== void 0 ? queryConditions.tempFilters : cachedQueryConditions.tempFilters
       linkageFilters = queryConditions.linkageFilters !== void 0 ? queryConditions.linkageFilters : cachedQueryConditions.linkageFilters

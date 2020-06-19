@@ -119,17 +119,17 @@ export class LayerItem extends React.PureComponent<ILayerItemProps, ILayerItemSt
     const { chartStyles } = widgetProps
     const { table } = chartStyles
     if (!table) { return null }
-
-    const { withPaging, pageSize } = table
+    const { withPaging, pageSize, pageNo, totalCount } = widgetProps.pagination
     const pagination: IPaginationParams = {
       withPaging,
       pageSize: 0,
       pageNo: 0,
-      totalCount: datasource.totalCount || 0
+      totalCount: 0
     }
     if (pagination.withPaging) {
-      pagination.pageSize = datasource.pageSize || +pageSize
-      pagination.pageNo = datasource.pageNo || 1
+      pagination.pageSize = datasource.pageSize || pageSize
+      pagination.pageNo = datasource.pageNo || pageNo
+      pagination.totalCount = datasource.totalCount || totalCount
     }
     return pagination
   }
@@ -242,7 +242,6 @@ export class LayerItem extends React.PureComponent<ILayerItemProps, ILayerItemSt
     this.setState({
       mousePos: [e.pageX, e.pageY]
     })
-    console.log('drag starts')
     return e.target !== data.node.lastElementChild
   }
 
@@ -255,7 +254,6 @@ export class LayerItem extends React.PureComponent<ILayerItemProps, ILayerItemSt
     if (mousePos[0] === e.pageX && mousePos[1] === e.pageY) {
       return
     }
-    console.log('drag stops')
     onDragLayerStop(itemId, data)
   }
 

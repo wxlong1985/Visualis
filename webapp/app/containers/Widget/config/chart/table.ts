@@ -52,7 +52,7 @@ const table: IChartInfo = {
       bordered: true,
       size: 'default',
       withPaging: true,
-      pageSize: '20',
+      pageSize: '5000',
       withNoAggregators: false
     },
     spec: {

@@ -192,7 +192,10 @@ export function* getResult (action: ShareDisplayActionType) {
     const asyncData = yield call(request, {
       method: 'post',
       url: `${api.view}/${execId}/getresult`,
-      data: {}
+      data: {
+        pageNo: requestParams && requestParams.pagination && requestParams.pagination.pageNo ? requestParams.pagination.pageNo : 1,
+        pageSize: requestParams && requestParams.pagination && requestParams.pagination.pageSize ? requestParams.pagination.pageSize : 5000
+      }
     })
     yield put(getResultLoaded(renderType, layerId, asyncData.payload, requestParams))
     // asyncData.payload可能为""

@@ -923,6 +923,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     const { dataParams, styleParams, pagination } = this.state
     this.setWidgetProps(dataParams, styleParams, {
       renderType: 'rerender',
+      // 翻页的时候，更新updatedPagination
       updatedPagination: {
         ...pagination,
         pageNo,
@@ -1068,7 +1069,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     }
   ) => {
     const { cols, rows, metrics, secondaryMetrics, filters, color, label, size, xAxis, tip, yAxis } = dataParams
-    const { selectedView, onLoadData, onExecuteQuery, onSetWidgetProps, onSetQueryData, view, cache, expired } = this.props
+    const { selectedView, onLoadData, onExecuteQuery, onSetWidgetProps, onSetQueryData, view, cache, expired, widgetProps } = this.props
     const { mode, chartModeSelectedChart, pagination } = this.state
     let renderType
     let updatedPagination
@@ -1187,8 +1188,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       noAggregators = withNoAggregators
       if (!fromPagination) {
         if (withPaging) {
-          updatedPagination.pageNo = 1
-          updatedPagination.pageSize = +pageSize
+          updatedPagination.pageNo = widgetProps && widgetProps.pagination && widgetProps.pagination.pageNo ? widgetProps.pagination.pageNo : 1
+          updatedPagination.pageSize = widgetProps && widgetProps.pagination && widgetProps.pagination.pageSize ? widgetProps.pagination.pageSize : +pageSize
         } else {
           updatedPagination.pageNo = 0
           updatedPagination.pageSize = 0
