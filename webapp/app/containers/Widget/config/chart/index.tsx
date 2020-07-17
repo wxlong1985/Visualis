@@ -34,6 +34,7 @@ import wordCloud from './wordCloud'
 import waterfall from './waterfall'
 import scorecard from './scorecard'
 import gauge from './gauge'
+import relationGraph from './relationGraph'
 import iframe from './iframe'
 import richText from './richText'
 import doubleYAxis from './doubleYAxis'
@@ -55,7 +56,8 @@ const widgetlibs: IChartInfo[] = [
   iframe,
   richText,
   doubleYAxis,
-  gauge
+  gauge,
+  relationGraph
 ]
 
 export default widgetlibs

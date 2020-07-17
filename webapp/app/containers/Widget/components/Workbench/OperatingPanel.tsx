@@ -34,6 +34,7 @@ import ScorecardSection, { IScorecardConfig } from './ConfigSections/ScorecardSe
 import IframeSection, { IframeConfig } from './ConfigSections/IframeSection'
 import TableSection from './ConfigSections/TableSection'
 import GaugeSection from './ConfigSections/GaugeSection'
+import RelationGraph from './ConfigSections/RelationGraph'
 import { ITableConfig } from '../Config/Table'
 import BarSection from './ConfigSections/BarSection'
 import RadarSection from './ConfigSections/RadarSection'
@@ -433,6 +434,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     notification.destroy()
   }
 
+  // 获取各种图表类型的数据 dataParams 和 styleParams
   private getChartDataConfig = (selectedCharts: IChartInfo[]) => {
     const { mode } = this.state
     const { dataParams, styleParams } = this.state
@@ -1881,7 +1883,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     const [dimetionsCount, metricsCount] = this.getDimetionsAndMetricsCount()
     const {
       spec, xAxis, yAxis, axis, splitLine, pivot: pivotConfig, label, legend,
-      visualMap, toolbox, areaSelect, scorecard, gauge, iframe, table, bar, radar, doubleYAxis } = styleParams
+      visualMap, toolbox, areaSelect, scorecard, gauge, relationGraph, iframe, table, bar, radar, doubleYAxis } = styleParams
 
     let categoryDragItems = this.state.categoryDragItems
     if (mode === 'pivot'
@@ -1901,6 +1903,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       </Menu>
     )
 
+    // 拖拽框
     const dropboxes = Object.entries(dataParams)
       .map(([k, v]) => {
         if (k === 'rows' && !showColsAndRows) {
@@ -1986,6 +1989,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       mapLegendLayerType = !(layerType && (layerType === 'heatmap' || layerType === 'map' || layerType === 'scatter'))
     }
 
+    // 中间栏的数据/样式/配置里的内容
     let tabPane
     switch (selectedTab) {
       case 'data':
@@ -2087,6 +2091,11 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
               title="仪表盘"
               config={gauge}
               onChange={this.styleChange('gauge')}
+            />}
+            {relationGraph && <RelationGraph
+              title="关系表"
+              config={relationGraph}
+              onChange={this.styleChange('relationGraph')}
             />}
             {iframe && <IframeSection
               title="内嵌网页"
@@ -2308,9 +2317,12 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     //   }
     // })
 
+    // widget编辑页的左、中两栏
     return (
       <div className={styles.operatingPanel}>
+        {/* 最左栏 */}
         <div className={styles.model} style={{display: isFold ? 'none' : ''}}>
+          {/* view选择下拉框 */}
           <div className={styles.viewSelect}>
             {
               Object.keys(view).length > 0 ? 
@@ -2337,6 +2349,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
               <Icon type="plus" />
             </Dropdown> */}
           </div>
+          {/* 分类型 */}
           <div className={styles.columnContainer}>
             <div className={styles.title}>
               <h4>分类型</h4>
@@ -2378,6 +2391,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
             </ul>
             <DropArea {...valueAreaProps}/>
           </div>
+          {/* 数值型 */}
           <div className={styles.columnContainer}>
             <div className={styles.title}>
               <h4>数值型</h4>
@@ -2420,6 +2434,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
             <DropArea {...categoryAreaProps}/>
           </div>
         </div>
+        {/* 中间栏 */}
         <div className={styles.config} style={{display: isFold ? 'none' : ''}}>
           <div className={styles.mode}>
             <RadioGroup
@@ -2446,7 +2461,10 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
               </RadioButton>
             </RadioGroup>
           </div>
+          {/* 各类图表的图标 */}
           <div className={styles.charts}>
+            {/* currentWidgetlibs是指在“透视驱动”或者“图表驱动”下有哪些图表类型 */}
+            {/* ChartIndicator是增加了tooltip之后的图标 */}
             {currentWidgetlibs.map((c) => (
               <ChartIndicator
                 key={c.id}

@@ -92,7 +92,12 @@ export enum ChartTypes {
   /**
    * 仪表盘
    */
-  Gauge = 17
+  Gauge = 17,
+
+  /**
+   * 关系图
+   */
+  RelationGraph = 18
 }
 
 export default ChartTypes

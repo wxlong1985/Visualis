@@ -700,6 +700,7 @@ export const iconMapping = {
   graph: 'icon-510tongji_guanxitu',
   waterfall: 'icon-waterfall',
   gauge: 'icon-gauge',
+  relationGraph: 'icon-relation-graph',
   radar: 'icon-radarchart',
   parallel: 'icon-parallel',
   confidenceBand: 'icon-confidence-band'

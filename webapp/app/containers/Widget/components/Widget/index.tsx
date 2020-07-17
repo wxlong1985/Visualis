@@ -28,6 +28,7 @@ import { IframeConfig } from '../Workbench/ConfigSections/IframeSection'
 import { ITableConfig } from '../Config/Table'
 import { IRichTextConfig, IBarConfig, IRadarConfig } from '../Workbench/ConfigSections'
 import { IDoubleYAxisConfig } from '../Workbench/ConfigSections/DoubleYAxisSection'
+import { IRelationGraphConfig } from '../Workbench/ConfigSections/RelationGraph'
 import { IModel } from '../Workbench/index'
 import WaterMask from '../WaterMask/index'
 import { IQueryVariableMap } from 'containers/Dashboard/Grid'
@@ -100,6 +101,7 @@ export interface IChartStyles {
   visualMap?: IVisualMapConfig
   scorecard?: IScorecardConfig
   gauge?: IGaugeConfig
+  relationGraph?: IRelationGraphConfig
   iframe?: IframeConfig
   table?: ITableConfig
   richText?: IRichTextConfig
