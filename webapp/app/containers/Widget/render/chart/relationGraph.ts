@@ -22,20 +22,24 @@ import { IChartProps } from '../../components/Chart'
 
 export default function (chartProps: IChartProps, drillOptions?: any) {
     // 维度数一定为2，指标数大于等于1
-    console.log('chartProps: ', chartProps);
-    const { cols, data } = chartProps
-    console.log('data: ', data);
+    const { cols, data, chartStyles } = chartProps
+    const { spec } = chartStyles
 
     // 顶层节点数量，默认为5，支持配置
     // 点击某个节点后，顶层节点变为1个
-    let rootNodeCount = 5
+    let rootNodeCount = spec.rootNodeCount
+    // 如果指定了1个顶层节点时，要用这个值
+    let rootNodeName = spec.rootNodeName
     // 度数，默认为3，支持配置
-    let linksLevel = 1
+    let linksLevel = spec.linksLevel
     // 节点大小，支持配置
-    let symbolSize = 120
+    let symbolSize = spec.symbolSize
+    // 节点上的字体大小
+    let nodeFontSize = spec.nodeFontSize
+    // 连线上的字体大小
+    let linkFontSize = spec.linkFontSize
     // 顶层节点默认的棕色
     const rootNodeColor = '#CC6633'
-
     // 第一维度的名字
     const firstColName = cols[0].name
     // 第二维度的名字
@@ -48,12 +52,20 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
         if (k === 0) {
             // 现在是在找根节点，找rootNodeCount数量的节点
             for (let i = 0; i < data.length; i++) {
-                if (!nodes.includes(data[i][firstColName])) {
-                    nodes.push(data[i][firstColName])
-                    if (nodes.length >= rootNodeCount) break
+                if (rootNodeName && rootNodeCount === 1) {
+                    // 指定了一个顶层节点时
+                    if (rootNodeName === data[i][firstColName]) {
+                        nodes.push(data[i][firstColName])
+                        break
+                    }
+                } else {
+                    // 有一个或多个顶层个节点时
+                    if (!nodes.includes(data[i][firstColName])) {
+                        nodes.push(data[i][firstColName])
+                        if (nodes.length >= rootNodeCount) break
+                    }
                 }
             }
-            console.log('nodes 1: ', nodes);
         } else {
             // 现在是找子节点，就是所有之前的节点连接到的节点
             for (let i = 0; i < data.length; i++) {
@@ -62,7 +74,6 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                     nodes.push(data[i][secondColName])
                 }
             }
-            console.log('nodes: ', nodes);
         }
     }
 
@@ -75,11 +86,17 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 name: nodes[i],
                 itemStyle: {
                     color: rootNodeColor
+                },
+                label: {
+                    fontSize: nodeFontSize
                 }
             })
         } else {
             tempData.push({
-                name: nodes[i]
+                name: nodes[i],
+                label: {
+                    fontSize: nodeFontSize
+                }
             })
         }
     }
@@ -96,7 +113,7 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                     if (formatter === '') {
                         formatter = key + '：' + data[i][key]
                     } else {
-                        formatter = '\n' + key + '：' + data[i][key]
+                        formatter += '\n' + key + '：' + data[i][key]
                     }
                 }
             })
@@ -106,9 +123,7 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 label: {
                     show: true,
                     formatter,
-                },
-                tooltip: {
-                    formatter: '来往资金总和：20\n来往资金次数：20'
+                    fontSize: linkFontSize
                 },
                 // TODOS: 根据第一指标的大小来决定宽度
                 lineStyle: {
@@ -120,8 +135,6 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
             unShowIndexes.push(i)
         }
     }
-    console.log('tempLinks: ', tempLinks);
-    console.log('unShowIndexes: ', unShowIndexes);
 
     for (let i = 0; i < unShowIndexes.length; i++) {
         tempData.forEach((item, index) => {

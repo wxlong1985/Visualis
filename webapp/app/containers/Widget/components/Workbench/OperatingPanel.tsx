@@ -34,7 +34,6 @@ import ScorecardSection, { IScorecardConfig } from './ConfigSections/ScorecardSe
 import IframeSection, { IframeConfig } from './ConfigSections/IframeSection'
 import TableSection from './ConfigSections/TableSection'
 import GaugeSection from './ConfigSections/GaugeSection'
-import RelationGraph from './ConfigSections/RelationGraph'
 import { ITableConfig } from '../Config/Table'
 import BarSection from './ConfigSections/BarSection'
 import RadarSection from './ConfigSections/RadarSection'
@@ -1612,6 +1611,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
   // @FIXME refactor function styleChange2
   private styleChange2 = (value: string | number, propPath: string[]) => {
+    console.log('value: ', value);
+    console.log('propPath: ', propPath);
     const { dataParams, styleParams } = this.state
     set(styleParams, propPath, value)
     let renderType: RenderType = 'clear'
@@ -1883,7 +1884,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     const [dimetionsCount, metricsCount] = this.getDimetionsAndMetricsCount()
     const {
       spec, xAxis, yAxis, axis, splitLine, pivot: pivotConfig, label, legend,
-      visualMap, toolbox, areaSelect, scorecard, gauge, relationGraph, iframe, table, bar, radar, doubleYAxis } = styleParams
+      visualMap, toolbox, areaSelect, scorecard, gauge, iframe, table, bar, radar, doubleYAxis } = styleParams
 
     let categoryDragItems = this.state.categoryDragItems
     if (mode === 'pivot'
@@ -1988,7 +1989,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       mapLabelLayerType = !(layerType && layerType === 'heatmap')
       mapLegendLayerType = !(layerType && (layerType === 'heatmap' || layerType === 'map' || layerType === 'scatter'))
     }
-
     // 中间栏的数据/样式/配置里的内容
     let tabPane
     switch (selectedTab) {
@@ -2091,11 +2091,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
               title="仪表盘"
               config={gauge}
               onChange={this.styleChange('gauge')}
-            />}
-            {relationGraph && <RelationGraph
-              title="关系表"
-              config={relationGraph}
-              onChange={this.styleChange('relationGraph')}
             />}
             {iframe && <IframeSection
               title="内嵌网页"

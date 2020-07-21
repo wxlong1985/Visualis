@@ -33,6 +33,21 @@ const relationGraph: IChartInfo = {
     },
   },
   style: {
+    // 有这个spec，在“样式”中才有基础的部分 在ConfigSections/SpecSection/specs里的内容
+    spec: {
+      // 顶层节点数，默认为5，支持配置
+      rootNodeCount: 5,
+      // 度数，默认为3，支持配置
+      linksLevel: 3,
+      // 节点大小，默认为120，支持配置
+      symbolSize: 120,
+      // 如果指定了1个顶层节点时，要用这个值
+      rootNodeName: '',
+      // 节点上的字体大小
+      nodeFontSize: 12,
+      // 连线上的字体大小
+      linkFontSize: 14
+    }
   }
 }
 

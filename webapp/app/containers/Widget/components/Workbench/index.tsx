@@ -639,6 +639,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       message.error('请选择一个View')
       return
     }
+
     const widget = {
       name,
       description,
@@ -884,6 +885,8 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
               <div className={styles.viewPanel}>
                 <div className={styles.widgetBlock}>
                   <Widget
+                    // 存一个tempWidgetProps值，用于后面onSetWidgetProps
+                    tempWidgetProps={JSON.parse(JSON.stringify(widgetProps))}
                     onSetWidgetProps={this.setWidgetProps}
                     {...widgetProps}
                     loading={<DashboardItemMask.Loading {...maskProps}/>}
