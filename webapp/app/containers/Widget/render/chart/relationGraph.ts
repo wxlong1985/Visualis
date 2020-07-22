@@ -22,7 +22,7 @@ import { IChartProps } from '../../components/Chart'
 
 export default function (chartProps: IChartProps, drillOptions?: any) {
     // 维度数一定为2，指标数大于等于1
-    const { cols, data, chartStyles } = chartProps
+    const { cols, data, chartStyles, color } = chartProps
     const { spec } = chartStyles
 
     // 顶层节点数量，默认为5，支持配置
@@ -77,6 +77,9 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
         }
     }
 
+    let colorValues = {}
+    if (Array.isArray(color.items) && color.items[0] && color.items[0].config && color.items[0].config.values) colorValues = color.items[0].config.values
+
     // 用于作为echarts数据的data
     const tempData = []
     for (let i = 0; i < nodes.length; i++) {
@@ -92,12 +95,19 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 }
             })
         } else {
-            tempData.push({
+            const obj = {
                 name: nodes[i],
+                itemStyle: {},
                 label: {
                     fontSize: nodeFontSize
                 }
-            })
+            }
+            if (colorValues[obj.name]) {
+                obj.itemStyle = {
+                    color: colorValues[obj.name]
+                }
+            }
+            tempData.push(obj)
         }
     }
 
@@ -105,9 +115,12 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
     const tempLinks = []
     // 度数不够，未展示的数据项的index数组，用于后面提示
     const unShowIndexes = []
+    // 存一个 当前所有连线中，第一个指标最大的值
+    let maxFirstIndicator = 0
     for (let i = 0; i < data.length; i++) {
         if (nodes.includes(data[i][firstColName]) && nodes.includes(data[i][secondColName])) {
             let formatter = ''
+            let firstIndicator = 0
             Object.keys(data[i]).forEach((key) => {
                 if (key !== firstColName && key !== secondColName) {
                     if (formatter === '') {
@@ -115,6 +128,8 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                     } else {
                         formatter += '\n' + key + '：' + data[i][key]
                     }
+                    firstIndicator = data[i][key]
+                    if (firstIndicator > maxFirstIndicator) maxFirstIndicator = firstIndicator
                 }
             })
             const link = {
@@ -125,15 +140,22 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                     formatter,
                     fontSize: linkFontSize
                 },
-                // TODOS: 根据第一指标的大小来决定宽度
                 lineStyle: {
-                    width: 1
+                    // 默认为1，后面根据第一个指标值的大小
+                    width: 1,
+                    // 用来后续根据第一个指标值的大小设置粗细
+                    data: firstIndicator
                 }
             }
             tempLinks.push(link)
         } else if (nodes.includes(data[i][firstColName]) && !nodes.includes(data[i][secondColName])) {
             unShowIndexes.push(i)
         }
+    }
+
+    // 给每条线根据第一个指标的值设置宽度(总共10个等级，根据数据进行计算，比如数据是2、5、20，则对应的宽度就依次是1、3、10)
+    for (let i = 0; i < tempLinks.length; i++) {
+        tempLinks[i].lineStyle.width = Math.ceil(tempLinks[i].lineStyle.data / maxFirstIndicator * 10)
     }
 
     for (let i = 0; i < unShowIndexes.length; i++) {
