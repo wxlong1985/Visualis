@@ -138,14 +138,17 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 label: {
                     show: true,
                     formatter,
-                    fontSize: linkFontSize
+                    fontSize: linkFontSize,
+                    tooltip: {
+                        formatter: '来往资金总和：20\n来往资金次数：20'
+                    },
                 },
                 lineStyle: {
                     // 默认为1，后面根据第一个指标值的大小
                     width: 1,
                     // 用来后续根据第一个指标值的大小设置粗细
-                    data: firstIndicator
-                }
+                    data: firstIndicator,
+                },
             }
             tempLinks.push(link)
         } else if (nodes.includes(data[i][firstColName]) && !nodes.includes(data[i][secondColName])) {
@@ -180,6 +183,8 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 label: {
                     show: true
                 },
+                // 是否开启鼠标缩放和平移漫游。默认不开启。如果只想要开启缩放或者平移，可以设置成 'scale' 或者 'move'。设置成 true 为都开启
+                roam: true,
                 edgeSymbol: ['circle', 'arrow'],
                 edgeSymbolSize: [0, 20],
                 edgeLabel: {
@@ -219,10 +224,7 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 //         formatter: '来往资金总和：20\n来往资金次数：20'
                 //     },
                 //     lineStyle: {
-                //         width:1
-                //     },
-                //     tooltip: {
-                //         formatter: '来往资金总和：20\n来往资金次数：20'
+                //         width:1,
                 //     },
                 // }, {
                 //     source: 'A',
@@ -245,11 +247,6 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 //         width: 4
                 //     }
                 // }],
-                // lineStyle: {
-                //     opacity: 1,
-                //     // width: 10,
-                //     curveness: 0
-                // }
             }
         ]
     }

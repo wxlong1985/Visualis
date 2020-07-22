@@ -39,6 +39,9 @@ function SpecSectionRelationGraph (props: ISpecSectionRelationGraphProps) {
     onChange(parseInt(e.target.value), [].concat('linkFontSize'))
   }
 
+  // 因为会有spec里不是正确的值，所以linksLevel这些值为undefined的情况，那种情况下下面的defaultValue里的数据都为空，但渲染了页面再更新数据没有更新页面上的显示
+  if (!linksLevel) return null
+
   return (
     <div className={styles.paneBlock}>
       <h4>{title}</h4>
