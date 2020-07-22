@@ -19,6 +19,8 @@ function SpecSectionRelationGraph (props: ISpecSectionRelationGraphProps) {
 
   const onRaidoChange = (e) => {
     onChange(e.target.value, [].concat(e.target.name as string | string[]))
+    // 在样式中，切换顶层节点数量之后，点击选中某个节点作为顶层节点的操作要被取消掉
+    onChange('', [].concat('rootNodeName'))
   }
 
   const onSelectChange = (value) => {

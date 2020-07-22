@@ -965,6 +965,33 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
           const mergedParams = that.getChartDataConfig(selectedCharts)
           const mergedDataParams = mergedParams.dataParams
           const mergedStyleParams = mergedParams.styleParams
+          const requestParamsFilters = filters.items.reduce((a, b) => {
+            return a.concat(b.config.sqlModel)
+          }, [])
+
+          // 关系图下
+          if (selectedCharts[0].name === 'relationGraph' && mergedStyleParams.spec) {
+            if (Array.isArray(requestParamsFilters) && requestParamsFilters[0] && cols.items && cols.items[0]) {
+              // 值筛选 && 选的是第一个维度 && 只选了一个值
+              if (requestParamsFilters[0].operator === 'in' && requestParamsFilters[0].name === cols.items[0].name && Array.isArray(requestParamsFilters[0].value) && requestParamsFilters[0].value.length === 1) {
+                // 值筛选一个值，后端返回全量数据，前端根据全量数据，顶层节点变为只有一个，为筛选的这个值
+                mergedStyleParams.spec.rootNodeCount = 1
+                // requestParamsFilters[0].value[0]的值是带了单引号的字符串
+                mergedStyleParams.spec.rootNodeName = requestParamsFilters[0].value[0].replace(/'/g, '')
+              } else if (requestParamsFilters[0].operator === '=' && requestParamsFilters[0].name === cols.items[0].name) {
+                // 条件筛选选的等于操作 && 选的是第一个维度 && 值是data里有的值
+                for (let i = 0; i < data.length; i++) {
+                  if (requestParamsFilters[0].value.replace(/'/g, '') === data[i][requestParamsFilters[0].name]) {
+                    mergedStyleParams.spec.rootNodeCount = 1
+                    // requestParamsFilters[0].value的值是带了单引号的字符串
+                    mergedStyleParams.spec.rootNodeName = requestParamsFilters[0].value.replace(/'/g, '')
+                    break
+                  }
+                }
+              }
+            }
+          }
+
           onSetWidgetProps({
             cols: cols.items.map((item) => ({
               ...item,
@@ -1218,6 +1245,9 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       flush: this.clearCacheStatus
     }
 
+    // 关系图下的请求都要加上这个参数
+    if (selectedCharts[0].name === 'relationGraph') requestParams.chartType = 'relation_graph'
+
     // 如果有view，就把view放进requestParams才能正常请求
     if (Object.keys(view).length > 0) requestParams.view = view
 
@@ -1252,6 +1282,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       const mergedParams = this.getChartDataConfig(selectedCharts)
       const mergedDataParams = mergedParams.dataParams
       const mergedStyleParams = mergedParams.styleParams
+
       onSetWidgetProps({
         data: null,
         cols: cols.items.map((item) => ({
