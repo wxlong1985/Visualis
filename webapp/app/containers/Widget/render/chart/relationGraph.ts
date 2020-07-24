@@ -171,7 +171,12 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
 
     return {
         tooltip: {
-            formatter: '{b}'
+            trigger: 'item',
+            formatter:function(params){
+                //params是echarts封装的参数
+                if (params.dataType === 'node') return params.name
+                if (params.dataType === 'edge') return params.data.label.formatter
+            }
         },
         animationDurationUpdate: 1500,
         animationEasingUpdate: 'quinticInOut',
