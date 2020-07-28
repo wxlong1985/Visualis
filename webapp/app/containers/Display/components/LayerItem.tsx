@@ -739,6 +739,7 @@ export interface ILayerParams {
   paddingLeft: number
   paddingRight: number
   contentText: string
+  displayMode: 'dynamic' | 'static'
 
   src: string
   controlSetting: string[]

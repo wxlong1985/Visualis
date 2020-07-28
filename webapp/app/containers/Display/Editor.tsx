@@ -249,6 +249,9 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
 
   public componentWillReceiveProps (nextProps: IEditorProps) {
     const { currentSlide, currentLayers } = nextProps
+    if (this.state.settingInfo && this.state.settingInfo.param) {
+      this.setDisplayMode(this.state.settingInfo.param.displayMode)
+    }
 
     let { slideParams, currentLocalLayers } = this.state
     if (currentSlide && currentSlide !== this.props.currentSlide) {
@@ -593,6 +596,28 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
     this.onEditLayers(editLayers)
     onResizeLayers(editLayers.map((layer) => layer.id))
     this.props.toggleLayersResizingStatus(editLayers.map((l) => l.id), false)
+  }
+
+  private setDisplayMode = (value) => {
+    const widgetDOMs = document.getElementsByClassName('widget-class')
+    const paginationDOMs = document.getElementsByClassName('ant-pagination')
+    if (value === 'static') {
+      // 静态模式，隐藏掉所有滚动条和分页组件
+      for (let i = 0; i < widgetDOMs.length; i++) {
+        widgetDOMs[i].style.overflow = 'hidden'
+      }
+      for (let i = 0; i < paginationDOMs.length; i++) {
+        paginationDOMs[i].style.display = 'none'
+      }
+    } else {
+      // 动态模式 恢复原值
+      for (let i = 0; i < widgetDOMs.length; i++) {
+        widgetDOMs[i].style.overflow = 'auto hidden'
+      }
+      for (let i = 0; i < paginationDOMs.length; i++) {
+        paginationDOMs[i].style.display = ''
+      }
+    }
   }
 
   private formItemChange = (field, val) => {
