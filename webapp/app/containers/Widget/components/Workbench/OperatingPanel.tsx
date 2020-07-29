@@ -2517,7 +2517,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
         </div>
         <div className={styles.toggleContainer}><div className={styles.toggle} onClick={onChangeIsFold}><Icon type={isFold ? "double-right" : "double-left"} /></div></div>
         <Modal
-          wrapClassName="ant-modal-small"
           visible={colorModalVisible}
           onCancel={this.cancelColorModal}
           afterClose={this.afterColorModalClose}

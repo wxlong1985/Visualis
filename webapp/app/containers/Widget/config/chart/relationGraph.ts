@@ -39,8 +39,8 @@ const relationGraph: IChartInfo = {
       rootNodeCount: 5,
       // 度数，默认为3，支持配置
       linksLevel: 3,
-      // 节点大小，默认为120，支持配置
-      symbolSize: 120,
+      // 节点大小，默认为40，支持配置
+      symbolSize: 40,
       // 如果指定了1个顶层节点时，要用这个值
       rootNodeName: '',
       // 节点上的字体大小

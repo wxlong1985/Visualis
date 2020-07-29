@@ -77,6 +77,11 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
         }
     }
 
+    if (nodes.length === 0 && rootNodeCount === 1 && rootNodeName) {
+        // 说明此时点击了一个节点，并且这个节点本身只是二级维度，这种情况下，页面上就只显示这一个节点
+        nodes.push(rootNodeName)
+    }
+
     let colorValues = {}
     if (Array.isArray(color.items) && color.items[0] && color.items[0].config && color.items[0].config.values) colorValues = color.items[0].config.values
 
@@ -178,12 +183,15 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 if (params.dataType === 'edge') return params.data.label.formatter
             }
         },
-        animationDurationUpdate: 1500,
-        animationEasingUpdate: 'quinticInOut',
         series: [
             {
                 type: 'graph',
-                layout: 'circular',
+                animation: false,
+                layout: 'force',
+                force: {
+                    repulsion: 500,
+                    edgeLength: 500
+                },
                 symbolSize,
                 label: {
                     show: true
