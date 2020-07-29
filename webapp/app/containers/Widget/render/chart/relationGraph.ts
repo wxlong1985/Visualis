@@ -126,15 +126,18 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
         if (nodes.includes(data[i][firstColName]) && nodes.includes(data[i][secondColName])) {
             let formatter = ''
             let firstIndicator = 0
-            Object.keys(data[i]).forEach((key) => {
+            Object.keys(data[i]).forEach((key, index) => {
                 if (key !== firstColName && key !== secondColName) {
                     if (formatter === '') {
                         formatter = key + '：' + data[i][key]
                     } else {
                         formatter += '\n' + key + '：' + data[i][key]
                     }
-                    firstIndicator = data[i][key]
-                    if (firstIndicator > maxFirstIndicator) maxFirstIndicator = firstIndicator
+                    if (index === 2) {
+                        // 用第一个指标的值来设置连接线的大小
+                        firstIndicator = data[i][key]
+                        if (firstIndicator > maxFirstIndicator) maxFirstIndicator = firstIndicator
+                    }
                 }
             })
             const link = {
@@ -163,16 +166,17 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
 
     // 给每条线根据第一个指标的值设置宽度(总共10个等级，根据数据进行计算，比如数据是2、5、20，则对应的宽度就依次是1、3、10)
     for (let i = 0; i < tempLinks.length; i++) {
-        tempLinks[i].lineStyle.width = Math.ceil(tempLinks[i].lineStyle.data / maxFirstIndicator * 10)
+        // 数据小于等于0的，就用最小的默认width：1
+        if (tempLinks[i].lineStyle.data > 0) tempLinks[i].lineStyle.width = Math.ceil(tempLinks[i].lineStyle.data / maxFirstIndicator * 10)
     }
 
-    for (let i = 0; i < unShowIndexes.length; i++) {
-        tempData.forEach((item, index) => {
-            if (item.name === data[i][firstColName]) {
-                // 度数不够，未展示的数据项的index数组，用于后面提示
-            }
-        })
-    }
+    // for (let i = 0; i < unShowIndexes.length; i++) {
+    //     tempData.forEach((item, index) => {
+    //         if (item.name === data[i][firstColName]) {
+    //             // 度数不够，未展示的数据项的index数组，用于后面提示
+    //         }
+    //     })
+    // }
 
     return {
         tooltip: {
