@@ -68,12 +68,14 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
             }
         } else {
             // 现在是找子节点，就是所有之前的节点连接到的节点
+            const tempNodes = []
             for (let i = 0; i < data.length; i++) {
                 if (nodes.includes(data[i][firstColName]) && !nodes.includes(data[i][secondColName])) {
                     // 如果第一维度的值在nodes数组里，就把对应的第二维度的值存进nodes数组中
-                    nodes.push(data[i][secondColName])
+                    tempNodes.push(data[i][secondColName])
                 }
             }
+            nodes = Array.from(new Set(nodes.concat(tempNodes)))
         }
     }
 
