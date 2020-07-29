@@ -77,6 +77,7 @@ function SpecSectionRelationGraph (props: ISpecSectionRelationGraphProps) {
               min={30}
               max={300}
               onBlur={onSymbolSizeBlur}
+              precision={0}
             />
           </Col>
         </Row>
@@ -90,6 +91,7 @@ function SpecSectionRelationGraph (props: ISpecSectionRelationGraphProps) {
               min={12}
               max={80}
               onBlur={onNodeFontSizeBlur}
+              precision={0}
             />
           </Col>
         </Row>
@@ -103,6 +105,7 @@ function SpecSectionRelationGraph (props: ISpecSectionRelationGraphProps) {
               min={12}
               max={80}
               onBlur={onLinkFontSizeBlur}
+              precision={0}
             />
           </Col>
         </Row>
