@@ -736,7 +736,15 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
   // 清除某一个指标或维度或筛选
   private removeDropboxItem = (from: string) => (name: string) => () => {
-    const { dataParams, styleParams } = this.state
+    const { dataParams, styleParams, chartModeSelectedChart } = this.state
+    if (chartModeSelectedChart && chartModeSelectedChart.name === 'relationGraph') {
+      // 关系图下，删除掉第一个维度的筛选条件时，顶层节点数变回为五个
+      const firstCol = dataParams.cols.items[0].name
+      if (firstCol === name) {
+        styleParams.spec.rootNodeCount = 5
+        styleParams.spec.rootNodeName = ''
+      }
+    }
     const prop = dataParams[from]
     prop.items = prop.items.filter((i) => i.name !== name)
     this.setWidgetProps(dataParams, styleParams)
