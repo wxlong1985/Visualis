@@ -93,7 +93,7 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
         if (i < rootNodeCount) {
             // 顶层节点，颜色默认为棕色
             tempData.push({
-                name: nodes[i],
+                name: nodes[i].toString(),
                 itemStyle: {
                     color: rootNodeColor
                 },
@@ -103,7 +103,7 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
             })
         } else {
             const obj = {
-                name: nodes[i],
+                name: nodes[i].toString(),
                 itemStyle: {},
                 label: {
                     fontSize: nodeFontSize
@@ -143,8 +143,8 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 }
             })
             const link = {
-                source: data[i][firstColName],
-                target: data[i][secondColName],
+                source: data[i][firstColName].toString(),
+                target: data[i][secondColName].toString(),
                 label: {
                     show: true,
                     formatter,
