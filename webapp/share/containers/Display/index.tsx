@@ -160,6 +160,14 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
     const { slide, layers, layersInfo } = nextProps
     const { scale } = this.state
     const [scaleWidth, scaleHeight] = scale
+    if (slide) {
+      const { slideParams } = JSON.parse(slide.config)
+
+      if (slideParams && slideParams.displayMode) {
+        this.setDisplayMode(slideParams.displayMode)
+      }
+    }
+
     if (slide && this.props.slide !== slide) {
       const { slideParams } = JSON.parse(slide.config)
       const { scaleMode, width, height } = slideParams
@@ -194,6 +202,30 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
             headlessBrowserRenderSign: true
           })
         }, 5000)
+      }
+    }
+  }
+
+  // 设置展示模式为静态模式或者是动态模式
+  private setDisplayMode = (value) => {
+    const widgetDOMs = document.getElementsByClassName('widget-class')
+    const paginationDOMs = document.getElementsByClassName('ant-pagination')
+    const test = document.getElementById('widget')
+    if (value === 'static') {
+      // 静态模式，隐藏掉所有滚动条和分页组件
+      for (let i = 0; i < widgetDOMs.length; i++) {
+        widgetDOMs[i].style.overflow = 'hidden'
+      }
+      for (let i = 0; i < paginationDOMs.length; i++) {
+        paginationDOMs[i].style.display = 'none'
+      }
+    } else {
+      // 动态模式 恢复原值
+      for (let i = 0; i < widgetDOMs.length; i++) {
+        widgetDOMs[i].style.overflow = 'auto hidden'
+      }
+      for (let i = 0; i < paginationDOMs.length; i++) {
+        paginationDOMs[i].style.display = ''
       }
     }
   }

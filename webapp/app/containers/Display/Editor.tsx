@@ -249,8 +249,8 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
 
   public componentWillReceiveProps (nextProps: IEditorProps) {
     const { currentSlide, currentLayers } = nextProps
-    if (this.state.settingInfo && this.state.settingInfo.param) {
-      this.setDisplayMode(this.state.settingInfo.param.displayMode)
+    if (this.state.slideParams && this.state.slideParams.displayMode) {
+      this.setDisplayMode(this.state.slideParams.displayMode)
     }
 
     let { slideParams, currentLocalLayers } = this.state
@@ -598,6 +598,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
     this.props.toggleLayersResizingStatus(editLayers.map((l) => l.id), false)
   }
 
+  // 设置展示模式为静态模式或者是动态模式
   private setDisplayMode = (value) => {
     const widgetDOMs = document.getElementsByClassName('widget-class')
     const paginationDOMs = document.getElementsByClassName('ant-pagination')
