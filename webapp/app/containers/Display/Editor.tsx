@@ -602,10 +602,18 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
   private setDisplayMode = (value) => {
     const widgetDOMs = document.getElementsByClassName('widget-class')
     const paginationDOMs = document.getElementsByClassName('ant-pagination')
+    const tableHeaderDOMs = document.getElementsByClassName('ant-table-header')
+    const tableBodyDOMs = document.getElementsByClassName('ant-table-body')
     if (value === 'static') {
       // 静态模式，隐藏掉所有滚动条和分页组件
       for (let i = 0; i < widgetDOMs.length; i++) {
         widgetDOMs[i].style.overflow = 'hidden'
+      }
+      for (let i = 0; i < tableHeaderDOMs.length; i++) {
+        tableHeaderDOMs[i].style.setProperty('overflow', 'hidden', 'important')
+      }
+      for (let i = 0; i < tableBodyDOMs.length; i++) {
+        tableBodyDOMs[i].style.overflow = 'hidden'
       }
       for (let i = 0; i < paginationDOMs.length; i++) {
         paginationDOMs[i].style.display = 'none'
@@ -614,6 +622,15 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
       // 动态模式 恢复原值
       for (let i = 0; i < widgetDOMs.length; i++) {
         widgetDOMs[i].style.overflow = 'auto hidden'
+      }
+      for (let i = 0; i < tableHeaderDOMs.length; i++) {
+        tableHeaderDOMs[i].style.overflow = ''
+        tableHeaderDOMs[i].style.overflowX = 'hidden !important'
+        tableHeaderDOMs[i].style.overflowY = 'scroll !important'
+      }
+      for (let i = 0; i < tableBodyDOMs.length; i++) {
+        tableBodyDOMs[i].style.overflow = ''
+        tableBodyDOMs[i].style.overflowY = 'scroll'
       }
       for (let i = 0; i < paginationDOMs.length; i++) {
         paginationDOMs[i].style.display = ''
