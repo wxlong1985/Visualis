@@ -212,6 +212,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
     const paginationDOMs = document.getElementsByClassName('ant-pagination')
     const tableHeaderDOMs = document.getElementsByClassName('ant-table-header')
     const tableBodyDOMs = document.getElementsByClassName('ant-table-body')
+    const tableWrapperDOMs = document.getElementsByClassName('ant-table-wrapper')
     if (value === 'static') {
       // 静态模式，隐藏掉所有滚动条和分页组件
       for (let i = 0; i < widgetDOMs.length; i++) {
@@ -222,6 +223,9 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
       }
       for (let i = 0; i < tableBodyDOMs.length; i++) {
         tableBodyDOMs[i].style.overflow = 'hidden'
+      }
+      for (let i = 0; i < tableWrapperDOMs.length; i++) {
+        tableWrapperDOMs[i].style.overflow = 'hidden'
       }
       for (let i = 0; i < paginationDOMs.length; i++) {
         paginationDOMs[i].style.display = 'none'
@@ -239,6 +243,10 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
       for (let i = 0; i < tableBodyDOMs.length; i++) {
         tableBodyDOMs[i].style.overflow = ''
         tableBodyDOMs[i].style.overflowY = 'scroll'
+      }
+      for (let i = 0; i < tableWrapperDOMs.length; i++) {
+        tableWrapperDOMs[i].style.overflowY = 'scroll'
+        tableWrapperDOMs[i].style.overflow = ''
       }
       for (let i = 0; i < paginationDOMs.length; i++) {
         paginationDOMs[i].style.display = ''
