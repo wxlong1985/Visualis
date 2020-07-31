@@ -905,6 +905,15 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       modalCallback: (config) => {
         if (config) {
           item.config = config as IDataParamConfig
+          // 保持dataParams.filters.items[i]和item一致，这样才能更换config
+          if (dataParams && dataParams.filters && dataParams.filters.items) {
+            for (let i = 0; i < dataParams.filters.items.length; i++) {
+              if (dataParams.filters.items[i].name === item.name) {
+                dataParams.filters.items[i] = item
+                break
+              }
+            }
+          }
           this.setWidgetProps(dataParams, styleParams)
         }
       },
@@ -1272,7 +1281,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
                        && queryMode === WorkbenchQueryMode.Immediately
                        || this.manuallyQuery
     this.manuallyQuery = false
-
 
     if (needRequest) {
       this.lastRequestParamString = requestParamString
@@ -1650,8 +1658,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
   // @FIXME refactor function styleChange2
   private styleChange2 = (value: string | number, propPath: string[]) => {
-    console.log('value: ', value);
-    console.log('propPath: ', propPath);
     const { dataParams, styleParams } = this.state
     set(styleParams, propPath, value)
     let renderType: RenderType = 'clear'
@@ -1702,6 +1708,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     })
   }
 
+  // 筛选框的保存
   private confirmFilterModal = (config) => {
     this.state.modalCallback(config)
     this.closeFilterModal()
