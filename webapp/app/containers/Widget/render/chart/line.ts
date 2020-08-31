@@ -57,11 +57,11 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
   const { smooth, step } = spec
 
   const { selectedItems } = drillOptions
-
   const labelOption = {
     label: getLabelOption('line', label, metrics)
   }
-
+  if (labelOption.label && labelOption.label.normal) labelOption.label.normal.show = true
+  if (labelOption.label && labelOption.label.normal) labelOption.label.normal.color = 'auto'
   const xAxisColumnName = cols[0].name
   let xAxisData = data.map((d) => d[xAxisColumnName] || '')
   let grouped = {}
@@ -186,14 +186,16 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
               dataArr[index].forEach((item) => {
                 if (Math.abs(g[`${m.agg}(${decodedMetricName})`] - item) <= 10) similarCount++
               })
-              if (labelOption.label && labelOption.label.normal) {
-                // 必须要创建一个新的对象，不然直接更改labelOption会污染到其他线的labelOption
-                tempLabelOption = JSON.parse(JSON.stringify(labelOption))
-                tempLabelOption.label.normal.distance += similarCount * 15
-              }
-              if (labelOption.label && labelOption.label.emphasis) {
-                tempLabelOption = JSON.parse(JSON.stringify(labelOption))
-                tempLabelOption.label.emphasis.distance += similarCount * 15
+              if (labelOption.label && similarCount) {
+                if (labelOption.label.normal) {
+                  // 必须要创建一个新的对象，不然直接更改labelOption会污染到其他线的labelOption
+                  tempLabelOption = JSON.parse(JSON.stringify(labelOption))
+                  tempLabelOption.label.normal.distance += similarCount * 15
+                }
+                if (labelOption.label.emphasis) {
+                  tempLabelOption = JSON.parse(JSON.stringify(labelOption))
+                  tempLabelOption.label.emphasis.distance += similarCount * 15
+                }
               }
               dataArr[index].push(g[`${m.agg}(${decodedMetricName})`])
             }
@@ -316,6 +318,5 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
       xAxisData
     )
   }
-
   return options
 }
