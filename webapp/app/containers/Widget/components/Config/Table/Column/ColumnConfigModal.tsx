@@ -30,6 +30,7 @@ interface IColumnStyleConfigStates {
   selectedColumnName: string
   conditionStyleConfigModalVisible: boolean
   currentConditionStyle: ITableConditionStyle
+  checkedColumns: []
 }
 
 export class ColumnStyleConfig extends React.PureComponent<IColumnStyleConfigProps, IColumnStyleConfigStates> {
@@ -42,7 +43,9 @@ export class ColumnStyleConfig extends React.PureComponent<IColumnStyleConfigPro
       localConfig,
       selectedColumnName: localConfig.length > 0 ? localConfig[0].columnName : '',
       conditionStyleConfigModalVisible: false,
-      currentConditionStyle: null
+      currentConditionStyle: null,
+      // 当前选中的列
+      checkedColumns: []
     }
   }
 
@@ -66,12 +69,25 @@ export class ColumnStyleConfig extends React.PureComponent<IColumnStyleConfigPro
     })
     return (
       <li className={itemCls} key={columnName} onClick={this.selectColumn(columnName)}>
+        <Checkbox style={{marginRight: '7px', paddingLeft: '0', position: 'relative', top: '1px'}} onChange={this.checkColumn(columnName)}></Checkbox>
         <i className={`iconfont ${getColumnIconByType(visualType)}`} />
         <Tooltip title={displayName} mouseEnterDelay={0.8}>
           <label>{displayName}</label>
         </Tooltip>
       </li>
     )
+  }
+
+  private checkColumn = (columnName: string) => (e) => {
+    const { checkedColumns } = this.state
+    if (e.target.checked) {
+      // 把这一列加进数组中
+      checkedColumns.push(columnName)
+      this.setState({ checkedColumns })
+    } else {
+      // 把这一列从数组中删除
+      checkedColumns.splice(checkedColumns.indexOf(columnName), 1)
+    }
   }
 
   private selectColumn = (columnName: string) => () => {
@@ -87,14 +103,30 @@ export class ColumnStyleConfig extends React.PureComponent<IColumnStyleConfigPro
     if (propPath === 'width' && typeof e !== 'number') return e = null
 
     const value = e.target ? (e.target.value || e.target.checked) : e
-    const { localConfig, selectedColumnName } = this.state
-    const nextLocalConfig = produce(localConfig, (draft) => {
-      const selectedColumn = draft.find(({ columnName }) => columnName === selectedColumnName)
-      set(selectedColumn, propPath, value)
-      // 如果是更改了列宽之后，要改这个widthChanged值为true
-      if (propPath === 'width') set(selectedColumn, 'widthChanged', true)
-      return draft
-    })
+    const { localConfig, selectedColumnName, checkedColumns } = this.state
+    let nextLocalConfig = []
+    // 如果当前列未勾选，则只更改当前列
+    // 开启列排序，暂不需要批量修改
+    if (!checkedColumns.includes(selectedColumnName) || propPath === 'sort') {
+      nextLocalConfig = produce(localConfig, (draft) => {
+        const selectedColumn = draft.find(({ columnName }) => columnName === selectedColumnName)
+        set(selectedColumn, propPath, value)
+        // 如果是更改了列宽之后，要改这个widthChanged值为true
+        if (propPath === 'width') set(selectedColumn, 'widthChanged', true)
+        return draft
+      })
+    } else {
+      // 如果当前列已勾选，则更改样式时要更改所有的勾选的列
+      nextLocalConfig = produce(localConfig, (draft) => {
+        checkedColumns.forEach((name) => {
+          const selectedColumn = draft.find(({ columnName }) => columnName === name)
+          set(selectedColumn, propPath, value)
+          // 如果是更改了列宽之后，要改这个widthChanged值为true
+          if (propPath === 'width') set(selectedColumn, 'widthChanged', true)
+        })
+        return draft
+      })
+    }
     this.setState({
       localConfig: nextLocalConfig
     })

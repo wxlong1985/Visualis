@@ -30,6 +30,8 @@ interface IHeaderConfigModalStates {
   currentSelectedKeys: string[]
   mapHeader: { [key: string]: ITableHeaderConfig }
   mapHeaderParent: { [key: string]: ITableHeaderConfig }
+  styleChangeModalVisible: boolean
+  styleChangeDefaultConfig: Object
 }
 
 class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHeaderConfigModalStates> {
@@ -78,7 +80,20 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
       currentEditingConfig: null,
       mapHeader,
       mapHeaderParent,
-      currentSelectedKeys: []
+      currentSelectedKeys: [],
+      styleChangeModalVisible: false,
+      // 批量修改样式 弹框里的初始数据
+      styleChangeDefaultConfig: [{
+        style: {
+          backgroundColor: "transparent",
+          fontColor: "#666",
+          fontFamily: "PingFang SC",
+          fontSize: "12",
+          fontStyle: "normal",
+          fontWeight: "normal",
+          justifyContent: "flex-start"
+        }
+      }]
     }
   }
 
@@ -125,7 +140,19 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
       localConfig,
       mapHeader,
       mapHeaderParent,
-      currentSelectedKeys: []
+      currentSelectedKeys: [],
+      styleChangeModalVisible: false,
+      styleChangeDefaultConfig: [{
+        style: {
+          backgroundColor: "transparent",
+          fontColor: "#666",
+          fontFamily: "PingFang SC",
+          fontSize: "12",
+          fontStyle: "normal",
+          fontWeight: "normal",
+          justifyContent: "flex-start"
+        }
+      }]
     })
   }
 
@@ -307,6 +334,36 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
     localConfig.some((config) => this.traverseHeaderConfig(config, null, cb))
     this.setState({
       localConfig: [...localConfig]
+    })
+  }
+
+  // 批量修改样式 弹框里的样式修改
+  private styleChangeModalChange = (record: ITableHeaderConfig, propName) => (e) => {
+    const value = e.target ? e.target.value : e
+    const tmpObj = this.state.styleChangeDefaultConfig[0].style
+    tmpObj[propName] = value
+    this.setState({
+      styleChangeDefaultConfig: [{
+        style: tmpObj
+      }],
+    })
+  }
+
+  private openStyleChangeModal = () => {
+    // 初始化 + 打开弹框
+    this.setState({
+      styleChangeDefaultConfig: [{
+        style: {
+          backgroundColor: "transparent",
+          fontColor: "#666",
+          fontFamily: "PingFang SC",
+          fontSize: "12",
+          fontStyle: "normal",
+          fontWeight: "normal",
+          justifyContent: "flex-start"
+        }
+      }],
+      styleChangeModalVisible: true
     })
   }
 
@@ -609,6 +666,110 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
     }
   }]
 
+  private styleChangeColumns: Array<ColumnProps<any>> = [{
+    title: '背景色',
+    dataIndex: 'backgroundColor',
+    key: 'backgroundColor',
+    width: 60,
+    render: (_, record: ITableHeaderConfig) => {
+      const { style } = record
+      const { backgroundColor } = style
+      return (
+        <Row type="flex" justify="center">
+          <Col>
+            <ColorPicker
+              className={stylesConfig.color}
+              value={backgroundColor}
+              onChange={this.styleChangeModalChange(record, 'backgroundColor')}
+            />
+          </Col>
+        </Row>
+      )
+    }
+  }, {
+    title: '字体',
+    dataIndex: 'font',
+    key: 'font',
+    width: 285,
+    render: (_, record: ITableHeaderConfig) => {
+      const { style } = record
+      const { fontSize, fontFamily, fontColor, fontStyle, fontWeight } = style
+      return (
+        <>
+          <Row gutter={8} type="flex" align="middle" className={stylesConfig.rowBlock}>
+            <Col span={14}>
+              <Select
+                size="small"
+                className={stylesConfig.colControl}
+                placeholder="字体"
+                value={fontFamily}
+                onChange={this.styleChangeModalChange(record, 'fontFamily')}
+              >
+                {fontFamilyOptions}
+              </Select>
+            </Col>
+            <Col span={6}>
+              <Select
+                size="small"
+                className={stylesConfig.colControl}
+                placeholder="文字大小"
+                value={fontSize}
+                onChange={this.styleChangeModalChange(record, 'fontSize')}
+              >
+                {fontSizeOptions}
+              </Select>
+            </Col>
+            <Col span={4}>
+              <ColorPicker
+                className={stylesConfig.color}
+                value={fontColor}
+                onChange={this.styleChangeModalChange(record, 'fontColor')}
+              />
+            </Col>
+          </Row>
+          <Row gutter={8} type="flex" align="middle" className={stylesConfig.rowBlock}>
+            <Col span={12}>
+              <Select
+                size="small"
+                className={stylesConfig.colControl}
+                value={fontStyle}
+                onChange={this.styleChangeModalChange(record, 'fontStyle')}
+              >
+                {fontStyleOptions}
+              </Select>
+            </Col>
+            <Col span={12}>
+              <Select
+                size="small"
+                className={stylesConfig.colControl}
+                value={fontWeight}
+                onChange={this.styleChangeModalChange(record, 'fontWeight')}
+              >
+                {fontWeightOptions}
+              </Select>
+            </Col>
+          </Row>
+        </>
+      )
+    }
+  }, {
+    title: '对齐',
+    dataIndex: 'justifyContent',
+    key: 'justifyContent',
+    width: 180,
+    render: (_, record: ITableHeaderConfig) => {
+      const { style } = record
+      const { justifyContent } = style
+      return (
+        <RadioGroup size="small" value={justifyContent} onChange={this.styleChangeModalChange(record, 'justifyContent')}>
+          <RadioButton value="flex-start">左对齐</RadioButton>
+          <RadioButton value="center">居中</RadioButton>
+          <RadioButton value="flex-end">右对齐</RadioButton>
+        </RadioGroup>
+      )
+    }
+  }]
+
   private modalFooter = [(
     <Button
       key="cancel"
@@ -641,9 +802,28 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
     // })
   }
 
+  // 点击 批量修改样式 弹框的OK
+  private styleChangeOk = () => {
+    const tempConfig = this.state.localConfig
+    tempConfig.forEach((config, index) => {
+      if (this.state.currentSelectedKeys.includes(config.key)) {
+        tempConfig[index].style = this.state.styleChangeDefaultConfig[0].style
+      }
+    })
+    this.setState({
+      localConfig: tempConfig,
+      styleChangeModalVisible: false
+    })
+  }
+
+  // 点击 批量修改样式 弹框的Cancel
+  private styleChangeCancel = () => {
+    this.setState({styleChangeModalVisible: false})
+  }
+
   public render () {
     const { visible } = this.props
-    const { localConfig, currentSelectedKeys } = this.state
+    const { localConfig, currentSelectedKeys, styleChangeDefaultConfig } = this.state
     const rowSelection: TableRowSelection<ITableHeaderConfig> = {
       ...this.tableRowSelection,
       selectedRowKeys: currentSelectedKeys
@@ -665,10 +845,25 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
       >
         <div className={stylesConfig.rows}>
           <Row gutter={8} className={stylesConfig.rowBlock} type="flex" align="middle">
-            <Col span={4}>
+            <Col span={6}>
               <Button type="primary" onClick={this.mergeColumns}>合并</Button>
+              <Button type="primary" style={{marginLeft: '10px'}} disabled={currentSelectedKeys.length <= 0} onClick={this.openStyleChangeModal}>批量修改样式</Button>
             </Col>
-            <Col span={19}>
+            <Modal
+              title="批量样式修改"
+              visible={this.state.styleChangeModalVisible}
+              onOk={this.styleChangeOk}
+              onCancel={this.styleChangeCancel}
+              width={800}
+            >
+              <Table
+                bordered={true}
+                pagination={false}
+                columns={this.styleChangeColumns}
+                dataSource={styleChangeDefaultConfig}
+              />
+            </Modal>
+            <Col span={17}>
               {/* <Row gutter={8} type="flex" justify="end" align="middle">
                 <ButtonGroup>
                   <Button onClick={this.moveUp}><Icon type="arrow-up" />上移</Button>
