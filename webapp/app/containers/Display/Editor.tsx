@@ -431,7 +431,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
     }, [])
 
     const requestParams = {
-      groups,
+      groups: Array.from(new Set(groups)),
       aggregators,
       filters: requestParamsFilters,
       tempFilters,
