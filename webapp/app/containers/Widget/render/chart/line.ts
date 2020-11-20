@@ -60,7 +60,7 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
   const labelOption = {
     label: getLabelOption('line', label, metrics)
   }
-  if (labelOption.label && labelOption.label.normal) labelOption.label.normal.show = true
+  // if (labelOption.label && labelOption.label.normal) labelOption.label.normal.show = true
   if (labelOption.label && labelOption.label.normal) labelOption.label.normal.color = 'auto'
   const xAxisColumnName = cols[0].name
   let xAxisData = data.map((d) => d[xAxisColumnName] || '')
