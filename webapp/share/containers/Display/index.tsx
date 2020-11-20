@@ -359,7 +359,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
     }, [])
 
     const requestParams = {
-      groups,
+      groups: Array.from(new Set(groups)),
       aggregators,
       filters: requestParamsFilters,
       tempFilters,
