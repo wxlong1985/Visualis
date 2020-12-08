@@ -98,9 +98,12 @@ export class Table extends React.PureComponent<IChartProps, ITableStates> {
 
   // 通过拖拽的方式调整表格列宽时触发的事件
   private handleResize = (idx: number) => (_, { size }: IResizeCallbackData) => {
+    const { cols, rows, metrics, data, onSetWidgetProps, pagination, secondaryMetrics, filters, selectedChart, orders, mode, model, onPaginationChange, chartStyles } = this.props
+    // 只有在widget页面才有onSetWidgetProps，也只有在widget页面可以拖拽列宽
+    if (!onSetWidgetProps) return
+    
     const nextColumns = resizeTableColumns(this.state.tableColumns, idx, size.width)
     this.setState({ tableColumns: nextColumns })
-    const { cols, rows, metrics, data, onSetWidgetProps, pagination, secondaryMetrics, filters, selectedChart, orders, mode, model, onPaginationChange, chartStyles } = this.props
     // tempWidgetProps是用来在onSetWidgetProps中使用的，所以只需要workbench中的原始字段
     const tempWidgetProps = { data, pagination, cols, rows, metrics, secondaryMetrics, filters, chartStyles, selectedChart, orders, mode, model, onPaginationChange }
     for (let i = 0; i < tempWidgetProps.cols.length; i++) {
@@ -119,7 +122,7 @@ export class Table extends React.PureComponent<IChartProps, ITableStates> {
         break
       }
     }
-    onSetWidgetProps(tempWidgetProps)
+    if (onSetWidgetProps) onSetWidgetProps(tempWidgetProps)
   }
 
   // 可拖拽列宽的列的配置
@@ -533,7 +536,7 @@ function getTableColumns (props: IChartProps) {
           cols[index].oldColumnCounts = totalColumnsLength
           // 更改全局数据中该column的width
           tempWidgetProps.cols = cols
-          onSetWidgetProps(tempWidgetProps)
+          if (onSetWidgetProps) onSetWidgetProps(tempWidgetProps)
         }
       }
     } else if (!column.width && column.widthChanged) {
@@ -551,7 +554,7 @@ function getTableColumns (props: IChartProps) {
         tempWidgetProps.cols = cols
         // 更新 “上一次的列数”为当前column的数量
         cols[index].oldColumnCounts = totalColumnsLength
-        onSetWidgetProps(tempWidgetProps)
+        if (onSetWidgetProps) onSetWidgetProps(tempWidgetProps)
       }
     }
 
@@ -639,7 +642,7 @@ function getTableColumns (props: IChartProps) {
           metrics[index].oldColumnCounts = totalColumnsLength
           // 更改全局数据中该column的width
           tempWidgetProps.metrics = metrics
-          onSetWidgetProps(tempWidgetProps)
+          if (onSetWidgetProps) onSetWidgetProps(tempWidgetProps)
         }
       }
     } else if (!column.width && column.widthChanged) {
@@ -657,7 +660,7 @@ function getTableColumns (props: IChartProps) {
         tempWidgetProps.metrics = metrics
         // 更新 “上一次的列数”为当前column的数量
         metrics[index].oldColumnCounts = totalColumnsLength
-        onSetWidgetProps(tempWidgetProps)
+        if (onSetWidgetProps) onSetWidgetProps(tempWidgetProps)
       }
     }
 

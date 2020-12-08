@@ -66,8 +66,8 @@ module.exports = require('./webpack.base.babel')({
       name: true,
       cacheGroups: {
         vendors: {
-          test: /[\\/]node_modules[\\/](?!antd|jquery|three|bootstrap-datepicker)(.[a-zA-Z0-9.\-_]+)[\\/]/,
-          // test: /[\\/]node_modules[\\/]/,
+          // test: /[\\/]node_modules[\\/](?!antd|jquery|three|bootstrap-datepicker)(.[a-zA-Z0-9.\-_]+)[\\/]/,
+          test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
           chunks: 'all'
         }

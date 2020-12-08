@@ -70,6 +70,11 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
           }
         }
       })
+      for (let i = 0; i < localConfig.length; i++) {
+        if (localConfig[i].isGroup) {
+          tempArr.push(localConfig[i])
+        }
+      }
       localConfig = tempArr
     }
     // 保存一个初始的localConfig，如果后面改变了顺序但是点击取消按钮，应该还原localConfig的顺序
@@ -131,6 +136,11 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
           }
         }
       })
+      for (let i = 0; i < localConfig.length; i++) {
+        if (localConfig[i].isGroup) {
+          tempArr.push(localConfig[i])
+        }
+      }
       localConfig = tempArr
     }
     // 点击弹框的保存后，会触发一次compontWillReceiveProps，可能是更新了顺序了，所以这里也要更新initLocalConfig
@@ -503,6 +513,7 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
           ref={this.headerNameInput}
           className={styles.tableInput}
           defaultValue={currentEditingHeaderName}
+          onBlur={this.saveEditingHeaderName}
           onPressEnter={this.saveEditingHeaderName}
         />
       )
