@@ -565,7 +565,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       case 'filters':
         if (cachedItem.visualType !== 'number' && cachedItem.visualType !== 'date') {
           const tempParams = {
-            columns: [cachedItem.name]
+            columns: cachedItem.name.split('@').length > 0 ? [cachedItem.name.split('@')[0]] : [cachedItem.name]
           }
           if (typeof this.props.view === 'object' && Object.keys(this.props.view).length > 0) tempParams.view = this.props.view
           onLoadDistinctValue(selectedView.id, tempParams)
@@ -867,6 +867,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       columns: [item.name]
     }
     if (typeof this.props.view === 'object' && Object.keys(this.props.view).length > 0) tempParams.view = this.props.view
+    
     onLoadDistinctValue(selectedView.id, tempParams)
     this.setState({
       modalCachedData: item,
