@@ -242,7 +242,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
       }
       for (let i = 0; i < tableBodyDOMs.length; i++) {
         tableBodyDOMs[i].style.overflow = ''
-        tableBodyDOMs[i].style.overflowY = 'scroll'
+        tableBodyDOMs[i].style.overflowY = 'auto'
       }
       for (let i = 0; i < tableWrapperDOMs.length; i++) {
         tableWrapperDOMs[i].style.overflowY = 'scroll'
