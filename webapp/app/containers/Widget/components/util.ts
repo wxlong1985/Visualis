@@ -701,6 +701,7 @@ export const iconMapping = {
   waterfall: 'icon-waterfall',
   gauge: 'icon-gauge',
   relationGraph: 'icon-relation-graph',
+  excel: 'icon-relation-excel',
   radar: 'icon-radarchart',
   parallel: 'icon-parallel',
   confidenceBand: 'icon-confidence-band'

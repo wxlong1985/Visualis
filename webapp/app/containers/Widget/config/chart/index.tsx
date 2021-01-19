@@ -38,6 +38,7 @@ import relationGraph from './relationGraph'
 import iframe from './iframe'
 import richText from './richText'
 import doubleYAxis from './doubleYAxis'
+import excel from './excel'
 
 const widgetlibs: IChartInfo[] = [
   table,
@@ -57,7 +58,8 @@ const widgetlibs: IChartInfo[] = [
   richText,
   doubleYAxis,
   gauge,
-  relationGraph
+  relationGraph,
+  excel
 ]
 
 export default widgetlibs

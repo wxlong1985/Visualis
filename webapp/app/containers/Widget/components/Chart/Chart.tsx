@@ -7,7 +7,6 @@ import chartOptionGenerator from '../../render/chart'
 import { getTriggeringRecord } from '../util'
 const styles = require('./Chart.less')
 
-
 export class Chart extends React.PureComponent<IChartProps> {
   private container: HTMLDivElement = null
   private instance: ECharts
@@ -25,9 +24,11 @@ export class Chart extends React.PureComponent<IChartProps> {
   private renderChart = (props: IChartProps) => {
     const { selectedChart, renderType, getDataDrillDetail, isDrilling, onSelectChartsItems, onDoInteract, onCheckTableInteract } = props
 
-    if (renderType === 'loading') {
-      return
-    }
+    if (renderType === 'loading') return
+
+    // excel类型，不需要加载echarts相关内容
+    if (selectedChart === 19) return
+
     if (!this.instance) {
       this.instance = echarts.init(this.container, 'default')
     } else {

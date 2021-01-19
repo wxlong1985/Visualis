@@ -66,7 +66,7 @@ export function* addWidget ({ payload }) {
     })
 
     yield put(widgetAdded(result.payload))
-    payload.resolve()
+    payload.resolve(result.payload.id)
   } catch (err) {
     yield put(addWidgetFail())
     errorHandler(err)

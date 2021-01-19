@@ -97,6 +97,7 @@ interface IOperatingPanelProps {
   onSetComputed: (computesField: any[]) => void
   onDeleteComputed: (computesField: any[]) => void
   onSetWidgetProps: (widgetProps: IWidgetProps) => void
+  onSetIsExcel: (isExcel: boolean) => void
   onLoadData: (
     viewId: number,
     requestParams: IDataRequestParams,
@@ -1356,6 +1357,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       // 执行查询数据接口
       // 虚拟view切换分类型和数值型时，会执行到这里，要加上判断，切换操作不调用查询数据的接口
       if (!this.changeValueCategory) {
+        // 图表驱动里的excel类型不请求数据
+        if (mode === 'chart' && selectedCharts[0].id === 19) return
         onExecuteQuery(selectedView.id, requestParams, (result) => {
           const { execId } = result
           this.execIds.push(execId)
@@ -1464,6 +1467,9 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
   // 选择 透视驱动和图表驱动下面的各个图标
   private chartSelect = (chart: IChartInfo) => {
+    // 若是excel类型，isExcel就要设为true，不然都重置为false
+    this.props.onSetIsExcel(chart.name === 'excel')
+
     const { mode, dataParams } = this.state
     const { cols, rows, metrics } = dataParams
     if (mode === 'pivot') {
@@ -2503,6 +2509,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
               </RadioButton>
             </RadioGroup>
           </div>
+
+
           {/* 各类图表的图标 */}
           <div className={styles.charts}>
             {/* currentWidgetlibs是指在“透视驱动”或者“图表驱动”下有哪些图表类型 */}

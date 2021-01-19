@@ -97,7 +97,12 @@ export enum ChartTypes {
   /**
    * 关系图
    */
-  RelationGraph = 18
+  RelationGraph = 18,
+
+  /**
+   * excel表格类型
+   */
+  Excel = 19,
 }
 
 export default ChartTypes

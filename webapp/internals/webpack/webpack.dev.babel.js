@@ -77,6 +77,8 @@ module.exports = require('./webpack.base.babel')({
           "'self'",
           'http://yourServerIp:yourServerPort'
         ],
+        // 不加的话iframe要报错
+        'frame-src': '*',
         'img-src': [
           "'self'",
           'data:'

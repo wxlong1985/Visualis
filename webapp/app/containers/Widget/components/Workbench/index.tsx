@@ -106,6 +106,7 @@ interface IWorkbenchStates {
   originalWidgetProps: IWidgetProps
   originalComputed: any[]
   widgetProps: IWidgetProps
+  isExcel: boolean
   settingFormVisible: boolean
   settings: IWorkbenchSettings
   contextId: string
@@ -158,6 +159,8 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
         model: {},
         onPaginationChange: this.paginationChange
       },
+      // 当前是否为Excel模式
+      isExcel: false,
       settingFormVisible: false,
       settings: this.initSettings(),
       /*
@@ -615,6 +618,15 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
     })
   }
 
+  // 更新 isExcel
+  private setIsExcel = (isExcel) => {
+    if (isExcel) {
+      this.setState({ isExcel })
+    } else {
+      this.setState({ isExcel })
+    }
+  }
+
   private setView = (view) => {
     this.view = view
     this.urlView = {
@@ -630,7 +642,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
   // 点击widget编辑页面右上角的保存
   private saveWidget = () => {
     const { params, onAddWidget, onEditWidget } = this.props
-    const { id, name, description, selectedViewId, controls, cache, expired, widgetProps, computed, originalComputed, autoLoadData, contextId, nodeName } = this.state
+    const { id, name, description, selectedViewId, controls, cache, expired, widgetProps, computed, originalComputed, autoLoadData, contextId, nodeName, isExcel } = this.state
     if (!name.trim()) {
       message.error('Widget名称不能为空')
       return
@@ -667,6 +679,13 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
     if (id) {
       onEditWidget({...widget, id}, () => {
         message.success('保存成功')
+
+        // if (isExcel) {
+        //   console.log('document.getElementById(dataWrangler).contentWindow: ', document.getElementById('dataWrangler').contentWindow);
+        //   console.log('document.getElementById(dataWrangler).contentWindow.save(): ', document.getElementById('dataWrangler').contentWindow.save());
+        //   document.getElementById('dataWrangler').contentWindow.visualisSaveWidget(id)
+        // }
+
         const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
         const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
         if (editSignDashboard) {
@@ -682,7 +701,11 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
         }
       })
     } else {
-      onAddWidget(widget, () => {
+      onAddWidget(widget, (widgetId) => {
+        // if (isExcel) {
+        //   document.getElementById('dataWrangler').contentWindow.visualisSaveWidget(widgetId)
+        // }
+
         message.success('保存成功')
         this.props.router.replace(`/project/${params.pid}/widgets`)
       })
@@ -798,7 +821,8 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       widgetProps,
       settingFormVisible,
       settings,
-      isFold
+      isFold,
+      isExcel
     } = this.state
     let selectedView = formedViews[selectedViewId]
 
@@ -812,6 +836,13 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       empty: !data.length,
       hasDataConfig
     }
+
+    const visualisData = {
+      viewId: selectedViewId,
+      requestParams: this.queryData
+    }
+
+    const dataWranglerUrl = `/sheet/add?simpleMode=true&showBottomBar=false&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
     return (
       <div className={styles.workbench}>
         <EditorHeader
@@ -862,6 +893,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
                 onCacheChange={this.cacheChange}
                 onExpiredChange={this.expiredChange}
                 onSetWidgetProps={this.setWidgetProps}
+                onSetIsExcel={this.setIsExcel}
                 onSetComputed={this.setComputed}
                 onDeleteComputed={this.deleteComputed}
                 onLoadData={onLoadViewData}
@@ -884,18 +916,22 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
               />
               <div className={styles.viewPanel}>
                 <div className={styles.widgetBlock}>
-                  <Widget
-                    // 存一个tempWidgetProps值，用于后面onSetWidgetProps
-                    tempWidgetProps={JSON.parse(JSON.stringify(widgetProps))}
-                    onSetWidgetProps={this.setWidgetProps}
-                    {...widgetProps}
-                    loading={<DashboardItemMask.Loading {...maskProps}/>}
-                    empty={<DashboardItemMask.Empty {...maskProps}/>}
-                    editing={true}
-                    onPaginationChange={this.paginationChange}
-                    onChartStylesChange={this.chartStylesChange}
-                    onRef={this.onRef}
-                  />
+                  { isExcel ? 
+                    <iframe src={dataWranglerUrl} width="100%" height="100%" frameBorder="0" id="dataWrangler"></iframe>
+                    :
+                    <Widget
+                      // 存一个tempWidgetProps值，用于后面onSetWidgetProps
+                      tempWidgetProps={JSON.parse(JSON.stringify(widgetProps))}
+                      onSetWidgetProps={this.setWidgetProps}
+                      {...widgetProps}
+                      loading={<DashboardItemMask.Loading {...maskProps}/>}
+                      empty={<DashboardItemMask.Empty {...maskProps}/>}
+                      editing={true}
+                      onPaginationChange={this.paginationChange}
+                      onChartStylesChange={this.chartStylesChange}
+                      onRef={this.onRef}
+                    />
+                  }
                 </div>
               </div>
             </SplitPane>

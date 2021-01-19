@@ -79,6 +79,12 @@
   content: "\e7be";
 }
 
+.icon-relation-excel:before {
+  position: relative;
+  top: 3px;
+  content: url('excel.svg');
+}
+
 .icon-widget-gallery:before {
   content: "\e671";
 }
