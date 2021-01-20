@@ -70,6 +70,7 @@ export interface IDataParams {
 }
 
 interface IOperatingPanelProps {
+  id: number
   views: IViewBase[]
   widgetProps: IWidgetProps
   originalWidgetProps: IWidgetProps
@@ -97,7 +98,6 @@ interface IOperatingPanelProps {
   onSetComputed: (computesField: any[]) => void
   onDeleteComputed: (computesField: any[]) => void
   onSetWidgetProps: (widgetProps: IWidgetProps) => void
-  onSetIsExcel: (isExcel: boolean) => void
   onLoadData: (
     viewId: number,
     requestParams: IDataRequestParams,
@@ -1357,7 +1357,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       // 执行查询数据接口
       // 虚拟view切换分类型和数值型时，会执行到这里，要加上判断，切换操作不调用查询数据的接口
       if (!this.changeValueCategory) {
-        // 图表驱动里的excel类型不请求数据
+        // 图表驱动里的excel类型，不走visualis里的查询数据逻辑，而是改动接dataWrangler的iframe的url
         if (mode === 'chart' && selectedCharts[0].id === 19) return
         onExecuteQuery(selectedView.id, requestParams, (result) => {
           const { execId } = result
@@ -1467,9 +1467,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
   // 选择 透视驱动和图表驱动下面的各个图标
   private chartSelect = (chart: IChartInfo) => {
-    // 若是excel类型，isExcel就要设为true，不然都重置为false
-    this.props.onSetIsExcel(chart.name === 'excel')
-
     const { mode, dataParams } = this.state
     const { cols, rows, metrics } = dataParams
     if (mode === 'pivot') {
@@ -1485,6 +1482,12 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
         this.setWidgetProps(selectedParams.dataParams, selectedParams.styleParams)
       }
     } else {
+      // 编辑widget页面里，每次从excel类型切到其他类型时，要删掉DataWrangler里面名为visualis_widget_{widgetId}的表格
+      if (chart.id !== 19 && document.getElementById('dataWrangler') && this.props.id !== 0) {
+        // this.props.id === 0是新建widget的时候，新建widget的时候只有保存widget时，如果是excel类型就要在DataWrangler里面保存表格
+        // 从excel类型切换到另外的类型时，要删除DataWrangler里的表格
+        document.getElementById('dataWrangler').contentWindow.deleteVisualisWidget(this.props.id)
+      }
       this.setState({
         chartModeSelectedChart: chart,
         pagination: { pageNo: 0, pageSize: 0, withPaging: false, totalCount: 0 }

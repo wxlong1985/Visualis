@@ -970,6 +970,11 @@ export class DashboardItem extends React.PureComponent<IDashboardItemProps, IDas
       />
     )
 
+    // excel类型接的visualis的data
+    const visualisData = {
+      viewId: this.props.widget.viewId,
+      requestParams: widgetProps.query
+    }
 
     return (
       <div className={gridItemClass} ref={(f) => this.container = f}>
@@ -1049,6 +1054,7 @@ export class DashboardItem extends React.PureComponent<IDashboardItemProps, IDas
               selectedItems={this.props.selectedItems}
               executeQueryFailed={this.props.executeQueryFailed}
             //  onHideDrillPanel={this.onHideDrillPanel}
+              visualisData={visualisData}
             />
             {dataDrillHistory}
           </div>

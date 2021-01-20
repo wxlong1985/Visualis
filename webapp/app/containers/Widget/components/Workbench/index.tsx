@@ -106,7 +106,6 @@ interface IWorkbenchStates {
   originalWidgetProps: IWidgetProps
   originalComputed: any[]
   widgetProps: IWidgetProps
-  isExcel: boolean
   settingFormVisible: boolean
   settings: IWorkbenchSettings
   contextId: string
@@ -159,8 +158,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
         model: {},
         onPaginationChange: this.paginationChange
       },
-      // 当前是否为Excel模式
-      isExcel: false,
       settingFormVisible: false,
       settings: this.initSettings(),
       /*
@@ -618,15 +615,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
     })
   }
 
-  // 更新 isExcel
-  private setIsExcel = (isExcel) => {
-    if (isExcel) {
-      this.setState({ isExcel })
-    } else {
-      this.setState({ isExcel })
-    }
-  }
-
   private setView = (view) => {
     this.view = view
     this.urlView = {
@@ -642,7 +630,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
   // 点击widget编辑页面右上角的保存
   private saveWidget = () => {
     const { params, onAddWidget, onEditWidget } = this.props
-    const { id, name, description, selectedViewId, controls, cache, expired, widgetProps, computed, originalComputed, autoLoadData, contextId, nodeName, isExcel } = this.state
+    const { id, name, description, selectedViewId, controls, cache, expired, widgetProps, computed, originalComputed, autoLoadData, contextId, nodeName } = this.state
     if (!name.trim()) {
       message.error('Widget名称不能为空')
       return
@@ -680,11 +668,18 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       onEditWidget({...widget, id}, () => {
         message.success('保存成功')
 
-        // if (isExcel) {
-        //   console.log('document.getElementById(dataWrangler).contentWindow: ', document.getElementById('dataWrangler').contentWindow);
-        //   console.log('document.getElementById(dataWrangler).contentWindow.save(): ', document.getElementById('dataWrangler').contentWindow.save());
-        //   document.getElementById('dataWrangler').contentWindow.visualisSaveWidget(id)
-        // }
+        // 关于DataWrangler保存和删除表格的逻辑：datawrangler收到visualis的信号，然后调用接口
+        // 1. 新建widget页面里：
+        //     1. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，保存widget，DataWrangler里保存一个名为visualis_widget_{widgetId}的表格
+        // 2. 编辑widget页面里：
+        //     1. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，保存widget，DataWrangler里保存一个名为visualis_widget_{widgetId}的表格
+        //     2. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，然后Visualis再切换到其他图表类型，全程DataWrangler里不保存表格也不删除表格
+        //     3. DataWrangler里已创建表格，Visualis初始是在excel类型，然后Visualis再切换到其他图表类型，切换时DataWrangler里删除原先的名为visualis_widget_{widgetId}的表格
+        //     4. DataWrangler里已创建表格，Visualis初始是在excel类型，中间可能有切换类型或者更改指标维度等各种操作，只要保存widget时还是在excel类型，则DataWrangler里删除原先的名为visualis_widget_{widgetId}的表格，再保存一个新的名为visualis_widget_{widgetId}的表格，这一步的操作是相当于将表格的数据和样式更新到最新进度，选择先删后改而不是直接编辑的原因是中间用户的操作可能导致已经删了原先的表格
+        console.log('widgetProps.selectedChart: ', widgetProps.selectedChart);
+        if (widgetProps.selectedChart === 19) {
+          document.getElementById('dataWrangler').contentWindow.saveVisualisWidget(id)
+        }
 
         const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
         const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
@@ -702,9 +697,9 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       })
     } else {
       onAddWidget(widget, (widgetId) => {
-        // if (isExcel) {
-        //   document.getElementById('dataWrangler').contentWindow.visualisSaveWidget(widgetId)
-        // }
+        if (widgetProps.selectedChart === 19) {
+          document.getElementById('dataWrangler').contentWindow.saveVisualisWidget(widgetId)
+        }
 
         message.success('保存成功')
         this.props.router.replace(`/project/${params.pid}/widgets`)
@@ -807,6 +802,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       onBeofreDropColunm
     } = this.props
     const {
+      id,
       name,
       description,
       selectedViewId,
@@ -822,7 +818,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       settingFormVisible,
       settings,
       isFold,
-      isExcel
     } = this.state
     let selectedView = formedViews[selectedViewId]
 
@@ -841,8 +836,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       viewId: selectedViewId,
       requestParams: this.queryData
     }
-
-    const dataWranglerUrl = `/sheet/add?simpleMode=true&showBottomBar=false&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
     return (
       <div className={styles.workbench}>
         <EditorHeader
@@ -872,6 +865,8 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
             >
               <OperatingPanel
                 ref={(f) => this.operatingPanel = f}
+                // widgetId
+                id={id}
                 widgetProps={widgetProps}
                 views={views}
                 originalWidgetProps={originalWidgetProps}
@@ -893,7 +888,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
                 onCacheChange={this.cacheChange}
                 onExpiredChange={this.expiredChange}
                 onSetWidgetProps={this.setWidgetProps}
-                onSetIsExcel={this.setIsExcel}
                 onSetComputed={this.setComputed}
                 onDeleteComputed={this.deleteComputed}
                 onLoadData={onLoadViewData}
@@ -916,22 +910,19 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
               />
               <div className={styles.viewPanel}>
                 <div className={styles.widgetBlock}>
-                  { isExcel ? 
-                    <iframe src={dataWranglerUrl} width="100%" height="100%" frameBorder="0" id="dataWrangler"></iframe>
-                    :
-                    <Widget
-                      // 存一个tempWidgetProps值，用于后面onSetWidgetProps
-                      tempWidgetProps={JSON.parse(JSON.stringify(widgetProps))}
-                      onSetWidgetProps={this.setWidgetProps}
-                      {...widgetProps}
-                      loading={<DashboardItemMask.Loading {...maskProps}/>}
-                      empty={<DashboardItemMask.Empty {...maskProps}/>}
-                      editing={true}
-                      onPaginationChange={this.paginationChange}
-                      onChartStylesChange={this.chartStylesChange}
-                      onRef={this.onRef}
-                    />
-                  }
+                  <Widget
+                    // 存一个tempWidgetProps值，用于后面onSetWidgetProps
+                    tempWidgetProps={JSON.parse(JSON.stringify(widgetProps))}
+                    onSetWidgetProps={this.setWidgetProps}
+                    {...widgetProps}
+                    loading={<DashboardItemMask.Loading {...maskProps}/>}
+                    empty={<DashboardItemMask.Empty {...maskProps}/>}
+                    editing={true}
+                    onPaginationChange={this.paginationChange}
+                    onChartStylesChange={this.chartStylesChange}
+                    onRef={this.onRef}
+                    visualisData={visualisData}
+                  />
                 </div>
               </div>
             </SplitPane>

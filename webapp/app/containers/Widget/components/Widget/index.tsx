@@ -169,6 +169,7 @@ export interface IWidgetProps {
   onSetWidgetProps: (widgetProps: IWidgetProps) => void
   // onHideDrillPanel?: (swtich: boolean) => void
   executeQueryFailed?: boolean
+  visualisData: object
 }
 
 export interface IWidgetConfig extends IWidgetProps {
@@ -233,7 +234,7 @@ export class Widget extends React.Component<
   }
 
   public render () {
-    const { loading, empty, mode, executeQueryFailed } = this.props
+    const { loading, empty, mode, executeQueryFailed, selectedChart, visualisData } = this.props
     const { width, height, getProgressPercent } = this.state
     const username = localStorage.getItem('username');
     const widgetProps = { width, height, ...this.props }
@@ -256,11 +257,16 @@ export class Widget extends React.Component<
       text: `${username}`,
       waterMaskWidth
     }
+    const dataWranglerUrl = `/sheet/add?simpleMode=true&showBottomBar=false&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
 
     return (
       <div className={styles.wrapper + ' widget-class'} ref={this.container} id="widget" style={{overflowX: 'auto', overflowY: 'hidden'}}>
         <WaterMask {...waterMaskProps} />
-        {widgetContent}
+        { selectedChart === 19 ? 
+          <iframe src={dataWranglerUrl} width="100%" height="100%" frameBorder="0" id="dataWrangler"></iframe>
+          :
+          widgetContent
+        }
         {loading}
         {/* 表格暂无数据时的提示，有了进度条就不需要了 */}
         {/* {empty} */}
