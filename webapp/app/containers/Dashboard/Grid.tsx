@@ -667,7 +667,7 @@ export class Grid extends React.Component<IGridProps, IGridStates> {
       this.execIds.push(execId)
       this.executeQuery(execId, renderType, itemId, widget.viewId, requestParams, {...requestParams, widget}, this)
     }, () => {
-      this.setState({executeQueryFailed: true})
+      // this.setState({executeQueryFailed: true})
       return message.error('查询失败！')
     })
   }
@@ -680,7 +680,7 @@ export class Grid extends React.Component<IGridProps, IGridStates> {
       const { progress, status } = result
       if (status === 'Failed') {
         // 提示 查询失败（显示表格头，就和现在的暂无数据保持一致的交互，只是提示换成“查询失败”）
-        that.setState({executeQueryFailed: true})
+        // that.setState({executeQueryFailed: true})
         that.deleteExecId(execId)
         return message.error('查询失败！')
       } else if (status === 'Succeed' && progress === 1) {
@@ -688,7 +688,7 @@ export class Grid extends React.Component<IGridProps, IGridStates> {
         onViewGetResult(execId, renderType, itemId, viewId, requestParams, statistic, (result) => {
           that.deleteExecId(execId)
         }, () => {
-          that.setState({executeQueryFailed: true})
+          // that.setState({executeQueryFailed: true})
           that.deleteExecId(execId)
           return message.error('查询失败！')
         })
@@ -699,7 +699,7 @@ export class Grid extends React.Component<IGridProps, IGridStates> {
         that.timeout.push(t)
       }
     }, () => {
-      that.setState({executeQueryFailed: true})
+      // that.setState({executeQueryFailed: true})
       that.deleteExecId(execId)
       return message.error('查询失败！')
     })

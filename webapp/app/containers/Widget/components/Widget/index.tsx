@@ -257,7 +257,7 @@ export class Widget extends React.Component<
       text: `${username}`,
       waterMaskWidth
     }
-    const dataWranglerUrl = `/sheet/add?simpleMode=true&showBottomBar=false&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
+    const dataWranglerUrl = `/sheet/add?simpleMode=true&showBottomBar=false&readonly=true&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
 
     return (
       <div className={styles.wrapper + ' widget-class'} ref={this.container} id="widget" style={{overflowX: 'auto', overflowY: 'hidden'}}>

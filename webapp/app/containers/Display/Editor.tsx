@@ -464,12 +464,14 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
     // 本身这里源代码就少一个statistic参数，可能没啥用，先随便赋个{}
     const statistic = {}
     this.setState({executeQueryFailed: false})
+    console.log('this.props: ', this.props);
+    console.log('this.state: ', this.state);
     onViewExecuteQuery(renderType, itemId, widget.viewId, requestParams, statistic,  (result) => {
       const { execId } = result
       this.execIds.push(execId)
       this.executeQuery(execId, renderType, itemId, widget.viewId, requestParams, statistic, this)
     }, () => {
-      this.setState({executeQueryFailed: true})
+      // this.setState({executeQueryFailed: true})
       return message.error('查询失败！')
     })
   }
@@ -482,7 +484,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
       const { progress, status } = result
       if (status === 'Failed') {
         // 提示 查询失败（显示表格头，就和现在的暂无数据保持一致的交互，只是提示换成“查询失败”）
-        that.setState({executeQueryFailed: true})
+        // that.setState({executeQueryFailed: true})
         that.deleteExecId(execId)
         return message.error('查询失败！')
       } else if (status === 'Succeed' && progress === 1) {
@@ -490,7 +492,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
         onViewGetResult(execId, renderType, itemId, viewId, requestParams, statistic, (result) => {
           that.deleteExecId(execId)
         }, () => {
-          that.setState({executeQueryFailed: true})
+          // that.setState({executeQueryFailed: true})
           that.deleteExecId(execId)
           return message.error('查询失败！')
         })
@@ -501,7 +503,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
         that.timeout.push(t)
       }
     }, () => {
-      that.setState({executeQueryFailed: true})
+      // that.setState({executeQueryFailed: true})
       that.deleteExecId(execId)
       return message.error('查询失败！')
     })

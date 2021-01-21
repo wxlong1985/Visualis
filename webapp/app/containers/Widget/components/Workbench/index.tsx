@@ -666,8 +666,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
     }
     if (id) {
       onEditWidget({...widget, id}, () => {
-        message.success('保存成功')
-
         // 关于DataWrangler保存和删除表格的逻辑：datawrangler收到visualis的信号，然后调用接口
         // 1. 新建widget页面里：
         //     1. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，保存widget，DataWrangler里保存一个名为visualis_widget_{widgetId}的表格
@@ -678,31 +676,57 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
         //     4. DataWrangler里已创建表格，Visualis初始是在excel类型，中间可能有切换类型或者更改指标维度等各种操作，只要保存widget时还是在excel类型，则DataWrangler里删除原先的名为visualis_widget_{widgetId}的表格，再保存一个新的名为visualis_widget_{widgetId}的表格，这一步的操作是相当于将表格的数据和样式更新到最新进度，选择先删后改而不是直接编辑的原因是中间用户的操作可能导致已经删了原先的表格
         console.log('widgetProps.selectedChart: ', widgetProps.selectedChart);
         if (widgetProps.selectedChart === 19) {
-          document.getElementById('dataWrangler').contentWindow.saveVisualisWidget(id)
-        }
+          document.getElementById('dataWrangler').contentWindow.saveVisualisWidget(id, 'edit')
 
-        const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
-        const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
-        if (editSignDashboard) {
-          sessionStorage.removeItem('editWidgetFromDashboard')
-          const [pid, portalId, portalName, dashboardId, itemId] = editSignDashboard.split(DEFAULT_SPLITER)
-          this.props.router.replace(`/project/${pid}/portal/${portalId}/portalName/${portalName}/dashboard/${dashboardId}`)
-        } else if (editSignDisplay) {
-          sessionStorage.removeItem('editWidgetFromDisplay')
-          const [pid, displayId] = editSignDisplay.split(DEFAULT_SPLITER)
-          this.props.router.replace(`/project/${pid}/display/${displayId}`)
+          // 交给iframe嵌的datawrangler使用，那边保存完成后再跳转
+          window.changeLocationEdit = () => {
+            message.success('保存成功')
+            console.log('changeLocationEdit');
+            const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
+            const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
+            if (editSignDashboard) {
+              sessionStorage.removeItem('editWidgetFromDashboard')
+              const [pid, portalId, portalName, dashboardId, itemId] = editSignDashboard.split(DEFAULT_SPLITER)
+              this.props.router.replace(`/project/${pid}/portal/${portalId}/portalName/${portalName}/dashboard/${dashboardId}`)
+            } else if (editSignDisplay) {
+              sessionStorage.removeItem('editWidgetFromDisplay')
+              const [pid, displayId] = editSignDisplay.split(DEFAULT_SPLITER)
+              this.props.router.replace(`/project/${pid}/display/${displayId}`)
+            } else {
+              this.props.router.replace(`/project/${params.pid}/widgets`)
+            }
+          }
         } else {
-          this.props.router.replace(`/project/${params.pid}/widgets`)
+          message.success('保存成功')
+          const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
+          const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
+          if (editSignDashboard) {
+            sessionStorage.removeItem('editWidgetFromDashboard')
+            const [pid, portalId, portalName, dashboardId, itemId] = editSignDashboard.split(DEFAULT_SPLITER)
+            this.props.router.replace(`/project/${pid}/portal/${portalId}/portalName/${portalName}/dashboard/${dashboardId}`)
+          } else if (editSignDisplay) {
+            sessionStorage.removeItem('editWidgetFromDisplay')
+            const [pid, displayId] = editSignDisplay.split(DEFAULT_SPLITER)
+            this.props.router.replace(`/project/${pid}/display/${displayId}`)
+          } else {
+            this.props.router.replace(`/project/${params.pid}/widgets`)
+          }
         }
       })
     } else {
       onAddWidget(widget, (widgetId) => {
         if (widgetProps.selectedChart === 19) {
-          document.getElementById('dataWrangler').contentWindow.saveVisualisWidget(widgetId)
+          document.getElementById('dataWrangler').contentWindow.saveVisualisWidget(widgetId, 'add')
+          // 交给iframe嵌的datawrangler使用，那边保存完成后再跳转
+          window.changeLocationAdd = () => {
+            console.log('changeLocationAdd');
+            message.success('保存成功')
+            this.props.router.replace(`/project/${params.pid}/widgets`)
+          }
+        } else {
+          message.success('保存成功')
+          this.props.router.replace(`/project/${params.pid}/widgets`)
         }
-
-        message.success('保存成功')
-        this.props.router.replace(`/project/${params.pid}/widgets`)
       })
     }
   }

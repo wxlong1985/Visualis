@@ -394,7 +394,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
       const { execId } = result
       this.executeQuery(execId, renderType, itemId, widget.dataToken, requestParams, this)
     }, () => {
-      this.setState({executeQueryFailed: true})
+      // this.setState({executeQueryFailed: true})
       return message.error('查询失败！')
     }, this.state.parameters)
   }
@@ -407,13 +407,13 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
       const { progress, status } = result
       if (status === 'Failed') {
         // 提示 查询失败（显示表格头，就和现在的暂无数据保持一致的交互，只是提示换成“查询失败”）
-        that.setState({executeQueryFailed: true})
+        // that.setState({executeQueryFailed: true})
         return message.error('查询失败！')
       } else if (status === 'Succeed' && progress === 1) {
         // 查询成功，调用 结果集接口，status为success时，progress一定为1
         onGetResult(execId, renderType, itemId, dataToken, requestParams, (result) => {
         }, () => {
-          that.setState({executeQueryFailed: true})
+          // that.setState({executeQueryFailed: true})
           return message.error('查询失败！')
         })
       } else {
@@ -423,7 +423,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
         that.timeout.push(t)
       }
     }, () => {
-      that.setState({executeQueryFailed: true})
+      // that.setState({executeQueryFailed: true})
       return message.error('查询失败！')
     })
   }
