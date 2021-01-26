@@ -277,8 +277,11 @@ export class LayerItem extends React.PureComponent<ILayerItemProps, ILayerItemSt
 
   private onResizeStop = (e, { size }) => {
     e.stopPropagation()
+    // prevWidth和prevHeight是这个layer拖拽前的长宽，不是widget的
     const { width: prevWidth, height: prevHeight } = this.state.layerParams
+    // size里的width和height是这个layer拖拽后的长宽
     const { width, height } = size
+    // 需要根据前后的值算出变动的长宽
     const delta = {
       deltaWidth:  width - prevWidth,
       deltaHeight: height - prevHeight

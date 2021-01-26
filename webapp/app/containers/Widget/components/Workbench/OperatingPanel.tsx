@@ -2636,6 +2636,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
             fieldConfig={currentEditingItem.field}
             onSave={this.saveFieldConfig}
             onCancel={this.cancelFieldConfig}
+            currentEditingItemName={this.state.currentEditingItem ? this.state.currentEditingItem.name : ''}
           />
         ), (
           <FormatConfigModal

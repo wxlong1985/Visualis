@@ -394,7 +394,7 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
       const { execId } = result
       this.executeQuery(execId, renderType, itemId, widget.dataToken, requestParams, this)
     }, () => {
-      // this.setState({executeQueryFailed: true})
+      this.setState({executeQueryFailed: true})
       return message.error('查询失败！')
     }, this.state.parameters)
   }
@@ -403,29 +403,32 @@ export class Display extends React.Component<IDisplayProps, IDisplayStates> {
 
   private executeQuery(execId, renderType, itemId, dataToken, requestParams, that) {
     const { onGetProgress, onGetResult } = that.props
-    onGetProgress(execId, (result) => {
-      const { progress, status } = result
-      if (status === 'Failed') {
-        // 提示 查询失败（显示表格头，就和现在的暂无数据保持一致的交互，只是提示换成“查询失败”）
-        // that.setState({executeQueryFailed: true})
-        return message.error('查询失败！')
-      } else if (status === 'Succeed' && progress === 1) {
-        // 查询成功，调用 结果集接口，status为success时，progress一定为1
-        onGetResult(execId, renderType, itemId, dataToken, requestParams, (result) => {
-        }, () => {
-          // that.setState({executeQueryFailed: true})
+    // 空数据的话，会不请求数据，execId为undefined，这时候不需要getProgress
+    if (execId) {
+      onGetProgress(execId, (result) => {
+        const { progress, status } = result
+        if (status === 'Failed') {
+          // 提示 查询失败（显示表格头，就和现在的暂无数据保持一致的交互，只是提示换成“查询失败”）
+          that.setState({executeQueryFailed: true})
           return message.error('查询失败！')
-        })
-      } else {
-        // 说明还在运行中
-        // 三秒后再请求一次进度查询接口
-        const t = setTimeout(that.executeQuery, 3000, execId, renderType, itemId, dataToken, requestParams, that)
-        that.timeout.push(t)
-      }
-    }, () => {
-      // that.setState({executeQueryFailed: true})
-      return message.error('查询失败！')
-    })
+        } else if (status === 'Succeed' && progress === 1) {
+          // 查询成功，调用 结果集接口，status为success时，progress一定为1
+          onGetResult(execId, renderType, itemId, dataToken, requestParams, (result) => {
+          }, () => {
+            that.setState({executeQueryFailed: true})
+            return message.error('查询失败！')
+          })
+        } else {
+          // 说明还在运行中
+          // 三秒后再请求一次进度查询接口
+          const t = setTimeout(that.executeQuery, 3000, execId, renderType, itemId, dataToken, requestParams, that)
+          that.timeout.push(t)
+        }
+      }, () => {
+        that.setState({executeQueryFailed: true})
+        return message.error('查询失败！')
+      })
+    }
   }
 
   private getPreviewStyle = (slideParams) => {

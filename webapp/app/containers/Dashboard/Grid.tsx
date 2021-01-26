@@ -667,7 +667,7 @@ export class Grid extends React.Component<IGridProps, IGridStates> {
       this.execIds.push(execId)
       this.executeQuery(execId, renderType, itemId, widget.viewId, requestParams, {...requestParams, widget}, this)
     }, () => {
-      // this.setState({executeQueryFailed: true})
+      this.setState({executeQueryFailed: true})
       return message.error('查询失败！')
     })
   }
@@ -676,33 +676,36 @@ export class Grid extends React.Component<IGridProps, IGridStates> {
 
   private executeQuery(execId, renderType, itemId, viewId, requestParams, statistic, that) {
     const { onViewGetProgress, onViewGetResult } = that.props
-    onViewGetProgress(execId, (result) => {
-      const { progress, status } = result
-      if (status === 'Failed') {
-        // 提示 查询失败（显示表格头，就和现在的暂无数据保持一致的交互，只是提示换成“查询失败”）
-        // that.setState({executeQueryFailed: true})
-        that.deleteExecId(execId)
-        return message.error('查询失败！')
-      } else if (status === 'Succeed' && progress === 1) {
-        // 查询成功，调用 结果集接口，status为success时，progress一定为1
-        onViewGetResult(execId, renderType, itemId, viewId, requestParams, statistic, (result) => {
-          that.deleteExecId(execId)
-        }, () => {
-          // that.setState({executeQueryFailed: true})
+    // 空数据的话，会不请求数据，execId为undefined，这时候不需要getProgress
+    if (execId) {
+      onViewGetProgress(execId, (result) => {
+        const { progress, status } = result
+        if (status === 'Failed') {
+          // 提示 查询失败（显示表格头，就和现在的暂无数据保持一致的交互，只是提示换成“查询失败”）
+          that.setState({executeQueryFailed: true})
           that.deleteExecId(execId)
           return message.error('查询失败！')
-        })
-      } else {
-        // 说明还在运行中
-        // 三秒后再请求一次进度查询接口
-        const t = setTimeout(that.executeQuery, 3000, execId, renderType, itemId, viewId, requestParams, statistic, that)
-        that.timeout.push(t)
-      }
-    }, () => {
-      // that.setState({executeQueryFailed: true})
-      that.deleteExecId(execId)
-      return message.error('查询失败！')
-    })
+        } else if (status === 'Succeed' && progress === 1) {
+          // 查询成功，调用 结果集接口，status为success时，progress一定为1
+          onViewGetResult(execId, renderType, itemId, viewId, requestParams, statistic, (result) => {
+            that.deleteExecId(execId)
+          }, () => {
+            that.setState({executeQueryFailed: true})
+            that.deleteExecId(execId)
+            return message.error('查询失败！')
+          })
+        } else {
+          // 说明还在运行中
+          // 三秒后再请求一次进度查询接口
+          const t = setTimeout(that.executeQuery, 3000, execId, renderType, itemId, viewId, requestParams, statistic, that)
+          that.timeout.push(t)
+        }
+      }, (err) => {
+        that.setState({executeQueryFailed: true})
+        that.deleteExecId(execId)
+        return message.error('查询失败！')
+      })
+    }
   }
 
   // private downloadCsv = (itemId: number, widgetId: number) => {
