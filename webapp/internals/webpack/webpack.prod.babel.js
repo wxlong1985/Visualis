@@ -158,10 +158,12 @@ module.exports = require('./webpack.base.babel')({
         'connect-src': [
           "'self'"
         ],
+        // 不加的话iframe要报错
+        'frame-src': '*',
         'img-src': [
           "'self'",
           'data:'
-        ]
+        ],
       },
       {
         enabled: true,
