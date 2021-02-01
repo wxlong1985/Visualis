@@ -432,6 +432,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       this.props.onKillExecute(execId, () => {}, () => {})
     })
     notification.destroy()
+    window.removeEventListener('message', this.listenerHanlder)
   }
 
   // 获取各种图表类型的数据 dataParams 和 styleParams
@@ -1487,16 +1488,9 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
         // this.props.id === 0是新建widget的时候，新建widget的时候只有保存widget时，如果是excel类型就要在DataWrangler里面保存表格
         // 从excel类型切换到另外的类型时，要删除DataWrangler里的表格
         document.getElementById('dataWrangler').contentWindow.postMessage({type: 'delete', id: this.props.id},'*')
+        this.chart = chart
         // 那边删除成功之后调用这个deleteVisualisWidgetListener再切换类型
-        window.deleteVisualisWidgetListener = () => {
-          this.setState({
-            chartModeSelectedChart: chart,
-            pagination: { pageNo: 0, pageSize: 0, withPaging: false, totalCount: 0 }
-          }, () => {
-            const selectedParams = this.getChartDataConfig([chart])
-            this.setWidgetProps(selectedParams.dataParams, selectedParams.styleParams)
-          })
-        }
+        window.addEventListener('message', this.listenerHanlder)
       } else {
         this.setState({
           chartModeSelectedChart: chart,
@@ -1506,6 +1500,20 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
           this.setWidgetProps(selectedParams.dataParams, selectedParams.styleParams)
         })
       }
+    }
+  }
+
+  private chart = null
+
+  private listenerHanlder = (event) => {
+    if (event.data.type === 'delete') {
+      this.setState({
+        chartModeSelectedChart: this.chart,
+        pagination: { pageNo: 0, pageSize: 0, withPaging: false, totalCount: 0 }
+      }, () => {
+        const selectedParams = this.getChartDataConfig([this.chart])
+        this.setWidgetProps(selectedParams.dataParams, selectedParams.styleParams)
+      })
     }
   }
 
