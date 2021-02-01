@@ -1486,7 +1486,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       if (chart.id !== 19 && document.getElementById('dataWrangler') && this.props.id !== 0) {
         // this.props.id === 0是新建widget的时候，新建widget的时候只有保存widget时，如果是excel类型就要在DataWrangler里面保存表格
         // 从excel类型切换到另外的类型时，要删除DataWrangler里的表格
-        document.getElementById('dataWrangler').contentWindow.deleteVisualisWidget(this.props.id)
+        document.getElementById('dataWrangler').contentWindow.postMessage({type: 'delete', id: this.props.id},'*')
         // 那边删除成功之后调用这个deleteVisualisWidgetListener再切换类型
         window.deleteVisualisWidgetListener = () => {
           this.setState({
