@@ -42,7 +42,38 @@ function refreshToken (response: AxiosResponse) {
 export function request (config: AxiosRequestConfig): AxiosPromise
 export function request (url: string, options?: AxiosRequestConfig): AxiosPromise
 export default function request (url: any, options?: AxiosRequestConfig): AxiosPromise {
-  return axios(url, options)
+  let tempUrl = url
+  if (typeof url === 'string') {
+    // GET类型的请求
+    if (url.split('?').length > 1) {
+      // 说明本身是有query的
+      tempUrl += `&labelsRoute=${window.apiEnv}`
+    } else {
+      tempUrl += `?labelsRoute=${window.apiEnv}`
+    }
+  // } else if (typeof url === 'object' && url.method === 'delete') {
+  } else if (typeof url === 'object') {
+    if (url.method === 'get') {
+      // GET类型的请求
+      if (url.url.split('?').length > 1) {
+        // 说明本身是有query的
+        tempUrl.url += `&labelsRoute=${window.apiEnv}`
+      } else {
+        tempUrl.url += `?labelsRoute=${window.apiEnv}`
+      }
+    } else {
+      if (url.data) {
+        url.data.labels = { route: window.apiEnv }
+      } else {
+        url.data = {
+          labels: {
+            route: window.apiEnv
+          }
+        }
+      }
+    }
+  }
+  return axios(tempUrl, options)
     .then(refreshToken)
     .then(parseJSON)
 }
