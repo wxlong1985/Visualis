@@ -1359,7 +1359,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       // 虚拟view切换分类型和数值型时，会执行到这里，要加上判断，切换操作不调用查询数据的接口
       if (!this.changeValueCategory) {
         // 图表驱动里的excel类型，不走visualis里的查询数据逻辑，而是改动接dataWrangler的iframe的url
-        if (mode === 'chart' && selectedCharts[0].id === 19) return
+        if (mode === 'chart' && selectedCharts[0].id === 19) return this.lastRequestParamString = ''
         onExecuteQuery(selectedView.id, requestParams, (result) => {
           const { execId } = result
           this.execIds.push(execId)
@@ -1599,6 +1599,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       ? getPivotModeSelectedCharts([])
       : [getTable()]
     const resetedParams = this.getChartDataConfig(selectedCharts)
+    // 这样清空了选项之后，重新切回到excel类型，才不会自动请求
+    this.props.onSetQueryData(null)
     this.setWidgetProps(resetedParams.dataParams, resetedParams.styleParams)
   }
 

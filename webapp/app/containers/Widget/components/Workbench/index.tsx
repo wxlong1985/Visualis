@@ -677,7 +677,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
         //     2. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，然后Visualis再切换到其他图表类型，全程DataWrangler里不保存表格也不删除表格
         //     3. DataWrangler里已创建表格，Visualis初始是在excel类型，然后Visualis再切换到其他图表类型，切换时DataWrangler里删除原先的名为visualis_widget_{widgetId}的表格
         //     4. DataWrangler里已创建表格，Visualis初始是在excel类型，中间可能有切换类型或者更改指标维度等各种操作，只要保存widget时还是在excel类型，则DataWrangler里删除原先的名为visualis_widget_{widgetId}的表格，再保存一个新的名为visualis_widget_{widgetId}的表格，这一步的操作是相当于将表格的数据和样式更新到最新进度，选择先删后改而不是直接编辑的原因是中间用户的操作可能导致已经删了原先的表格
-        if (widgetProps.selectedChart === 19) {
+        if (widgetProps.selectedChart === 19 && widgetProps.mode === 'chart') {
           document.getElementById('dataWrangler').contentWindow.postMessage({type: 'save', id, mode: 'edit'},'*')
           this.params = params
           // 交给iframe嵌的datawrangler使用，那边保存完成后再跳转
@@ -701,7 +701,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       })
     } else {
       onAddWidget(widget, (widgetId) => {
-        if (widgetProps.selectedChart === 19) {
+        if (widgetProps.selectedChart === 19 && widgetProps.mode === 'chart' ) {
           document.getElementById('dataWrangler').contentWindow.postMessage({type: 'save', id: widgetId, mode: 'add'}, '*')
           // 交给iframe嵌的datawrangler使用，那边保存完成后再跳转
           this.params = params
@@ -751,9 +751,19 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
   }
 
   private cancel = () => {
-    sessionStorage.removeItem('editWidgetFromDashboard')
-    sessionStorage.removeItem('editWidgetFromDisplay')
-    this.props.router.goBack()
+    const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
+    const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
+    if (editSignDashboard) {
+      sessionStorage.removeItem('editWidgetFromDashboard')
+      const [pid, portalId, portalName, dashboardId, itemId] = editSignDashboard.split(DEFAULT_SPLITER)
+      this.props.router.replace(`/project/${pid}/portal/${portalId}/portalName/${portalName}/dashboard/${dashboardId}`)
+    } else if (editSignDisplay) {
+      sessionStorage.removeItem('editWidgetFromDisplay')
+      const [pid, displayId] = editSignDisplay.split(DEFAULT_SPLITER)
+      this.props.router.replace(`/project/${pid}/display/${displayId}`)
+    } else {
+      this.props.router.replace(`/project/${this.props.params.pid}/widgets`)
+    }
   }
 
   private paginationChange = (pageNo: number, pageSize: number, orders) => {
@@ -867,9 +877,10 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       hasDataConfig
     }
 
-    const visualisData = {
-      viewId: selectedViewId,
-      requestParams: this.queryData
+    const visualisData = {}
+    if (widgetProps.mode == 'chart' && widgetProps.selectedChart === 19) {
+      visualisData.viewId = selectedViewId
+      visualisData.requestParams = this.queryData
     }
     return (
       <div className={styles.workbench}>
