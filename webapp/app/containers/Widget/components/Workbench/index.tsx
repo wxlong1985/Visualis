@@ -413,9 +413,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
     this.props.onClearCurrentWidget()
     // 离开页面时清除viewId的数据，因为只有第一次进入页面时需要，如果url里有?viewId=${viewId}进行自动选择view
     sessionStorage.setItem('viewId', '');
-    window.removeEventListener('message', this.addListenerHandler)
-    window.removeEventListener('message', this.editListenerHandler)
-
   }
 
   // 比如查询模式和是否允许多选拖拽这些用户的基本设置
@@ -669,76 +666,26 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
     }
     if (id) {
       onEditWidget({...widget, id}, () => {
-        // 关于DataWrangler保存和删除表格的逻辑：datawrangler收到visualis的信号，然后调用接口
-        // 1. 新建widget页面里：
-        //     1. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，保存widget，DataWrangler里保存一个名为visualis_widget_{widgetId}的表格
-        // 2. 编辑widget页面里：
-        //     1. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，保存widget，DataWrangler里保存一个名为visualis_widget_{widgetId}的表格
-        //     2. DataWrangler尚未创建表格，Visualis切换到excel类型，使用当前Visualis的选择参数加载数据，然后Visualis再切换到其他图表类型，全程DataWrangler里不保存表格也不删除表格
-        //     3. DataWrangler里已创建表格，Visualis初始是在excel类型，然后Visualis再切换到其他图表类型，切换时DataWrangler里删除原先的名为visualis_widget_{widgetId}的表格
-        //     4. DataWrangler里已创建表格，Visualis初始是在excel类型，中间可能有切换类型或者更改指标维度等各种操作，只要保存widget时还是在excel类型，则DataWrangler里删除原先的名为visualis_widget_{widgetId}的表格，再保存一个新的名为visualis_widget_{widgetId}的表格，这一步的操作是相当于将表格的数据和样式更新到最新进度，选择先删后改而不是直接编辑的原因是中间用户的操作可能导致已经删了原先的表格
-        if (widgetProps.selectedChart === 19 && widgetProps.mode === 'chart') {
-          document.getElementById('dataWrangler').contentWindow.postMessage({type: 'save', id, mode: 'edit'},'*')
-          this.params = params
-          // 交给iframe嵌的datawrangler使用，那边保存完成后再跳转
-          window.addEventListener('message', this.editListenerHandler)
+        message.success('保存成功')
+        const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
+        const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
+        if (editSignDashboard) {
+          sessionStorage.removeItem('editWidgetFromDashboard')
+          const [pid, portalId, portalName, dashboardId, itemId] = editSignDashboard.split(DEFAULT_SPLITER)
+          this.props.router.replace(`/project/${pid}/portal/${portalId}/portalName/${portalName}/dashboard/${dashboardId}`)
+        } else if (editSignDisplay) {
+          sessionStorage.removeItem('editWidgetFromDisplay')
+          const [pid, displayId] = editSignDisplay.split(DEFAULT_SPLITER)
+          this.props.router.replace(`/project/${pid}/display/${displayId}`)
         } else {
-          message.success('保存成功')
-          const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
-          const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
-          if (editSignDashboard) {
-            sessionStorage.removeItem('editWidgetFromDashboard')
-            const [pid, portalId, portalName, dashboardId, itemId] = editSignDashboard.split(DEFAULT_SPLITER)
-            this.props.router.replace(`/project/${pid}/portal/${portalId}/portalName/${portalName}/dashboard/${dashboardId}`)
-          } else if (editSignDisplay) {
-            sessionStorage.removeItem('editWidgetFromDisplay')
-            const [pid, displayId] = editSignDisplay.split(DEFAULT_SPLITER)
-            this.props.router.replace(`/project/${pid}/display/${displayId}`)
-          } else {
-            this.props.router.replace(`/project/${params.pid}/widgets`)
-          }
-        }
-      })
-    } else {
-      onAddWidget(widget, (widgetId) => {
-        if (widgetProps.selectedChart === 19 && widgetProps.mode === 'chart' ) {
-          document.getElementById('dataWrangler').contentWindow.postMessage({type: 'save', id: widgetId, mode: 'add'}, '*')
-          // 交给iframe嵌的datawrangler使用，那边保存完成后再跳转
-          this.params = params
-          window.addEventListener('message', this.addListenerHandler)
-        } else {
-          message.success('保存成功')
           this.props.router.replace(`/project/${params.pid}/widgets`)
         }
       })
-    }
-  }
-
-  private params = null
-
-  private editListenerHandler = (event) => {
-    message.success('保存成功')
-    if (event.data.type === 'edit') {
-      const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
-      const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
-      if (editSignDashboard) {
-        sessionStorage.removeItem('editWidgetFromDashboard')
-        const [pid, portalId, portalName, dashboardId, itemId] = editSignDashboard.split(DEFAULT_SPLITER)
-        this.props.router.replace(`/project/${pid}/portal/${portalId}/portalName/${portalName}/dashboard/${dashboardId}`)
-      } else if (editSignDisplay) {
-        sessionStorage.removeItem('editWidgetFromDisplay')
-        const [pid, displayId] = editSignDisplay.split(DEFAULT_SPLITER)
-        this.props.router.replace(`/project/${pid}/display/${displayId}`)
-      } else {
-        this.props.router.replace(`/project/${this.params.pid}/widgets`)
-      }
-    }
-  }
-
-  private addListenerHandler = (event) => {
-    if (event.data.type === 'add') {
-      message.success('保存成功')
-      this.props.router.replace(`/project/${this.params.pid}/widgets`)
+    } else {
+      onAddWidget(widget, () => {
+        message.success('保存成功')
+        this.props.router.replace(`/project/${params.pid}/widgets`)
+      })
     }
   }
 
@@ -877,11 +824,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       hasDataConfig
     }
 
-    const visualisData = {}
-    if (widgetProps.mode == 'chart' && widgetProps.selectedChart === 19) {
-      visualisData.viewId = selectedViewId
-      visualisData.requestParams = this.queryData
-    }
     return (
       <div className={styles.workbench}>
         <EditorHeader
@@ -967,7 +909,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
                     onPaginationChange={this.paginationChange}
                     onChartStylesChange={this.chartStylesChange}
                     onRef={this.onRef}
-                    visualisData={visualisData}
                   />
                 </div>
               </div>

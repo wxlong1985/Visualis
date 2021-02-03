@@ -357,11 +357,6 @@ export class LayerItem extends React.PureComponent<ILayerItemProps, ILayerItemSt
     const isLoading = !pure && loading
     const data = datasource.resultList || []
 
-    // excel类型接的visualis的data
-    const visualisData = {
-      viewId: this.props.widget.viewId,
-      requestParams: widgetProps.query
-    }
     return (
       <div
         ref={(f) => this.refLayer = f}
@@ -387,7 +382,6 @@ export class LayerItem extends React.PureComponent<ILayerItemProps, ILayerItemSt
             model={model}
             onPaginationChange={this.paginationChange}
             executeQueryFailed={executeQueryFailed}
-            visualisData={visualisData}
           />)
         )}
       </div>

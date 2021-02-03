@@ -432,7 +432,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       this.props.onKillExecute(execId, () => {}, () => {})
     })
     notification.destroy()
-    window.removeEventListener('message', this.listenerHanlder)
   }
 
   // 获取各种图表类型的数据 dataParams 和 styleParams
@@ -1358,8 +1357,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       // 执行查询数据接口
       // 虚拟view切换分类型和数值型时，会执行到这里，要加上判断，切换操作不调用查询数据的接口
       if (!this.changeValueCategory) {
-        // 图表驱动里的excel类型，不走visualis里的查询数据逻辑，而是改动接dataWrangler的iframe的url
-        if (mode === 'chart' && selectedCharts[0].id === 19) return this.lastRequestParamString = ''
         onExecuteQuery(selectedView.id, requestParams, (result) => {
           const { execId } = result
           this.execIds.push(execId)
@@ -1483,35 +1480,11 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
         this.setWidgetProps(selectedParams.dataParams, selectedParams.styleParams)
       }
     } else {
-      // 编辑widget页面里，每次从excel类型切到其他类型时，要删掉DataWrangler里面名为visualis_widget_{widgetId}的表格
-      if (chart.id !== 19 && document.getElementById('dataWrangler') && this.props.id !== 0) {
-        // this.props.id === 0是新建widget的时候，新建widget的时候只有保存widget时，如果是excel类型就要在DataWrangler里面保存表格
-        // 从excel类型切换到另外的类型时，要删除DataWrangler里的表格
-        document.getElementById('dataWrangler').contentWindow.postMessage({type: 'delete', id: this.props.id},'*')
-        this.chart = chart
-        // 那边删除成功之后调用这个deleteVisualisWidgetListener再切换类型
-        window.addEventListener('message', this.listenerHanlder)
-      } else {
-        this.setState({
-          chartModeSelectedChart: chart,
-          pagination: { pageNo: 0, pageSize: 0, withPaging: false, totalCount: 0 }
-        }, () => {
-          const selectedParams = this.getChartDataConfig([chart])
-          this.setWidgetProps(selectedParams.dataParams, selectedParams.styleParams)
-        })
-      }
-    }
-  }
-
-  private chart = null
-
-  private listenerHanlder = (event) => {
-    if (event.data.type === 'delete') {
       this.setState({
-        chartModeSelectedChart: this.chart,
+        chartModeSelectedChart: chart,
         pagination: { pageNo: 0, pageSize: 0, withPaging: false, totalCount: 0 }
       }, () => {
-        const selectedParams = this.getChartDataConfig([this.chart])
+        const selectedParams = this.getChartDataConfig([chart])
         this.setWidgetProps(selectedParams.dataParams, selectedParams.styleParams)
       })
     }
@@ -1599,8 +1572,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       ? getPivotModeSelectedCharts([])
       : [getTable()]
     const resetedParams = this.getChartDataConfig(selectedCharts)
-    // 这样清空了选项之后，重新切回到excel类型，才不会自动请求
-    this.props.onSetQueryData(null)
     this.setWidgetProps(resetedParams.dataParams, resetedParams.styleParams)
   }
 

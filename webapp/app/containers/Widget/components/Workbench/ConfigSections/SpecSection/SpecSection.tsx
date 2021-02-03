@@ -9,8 +9,7 @@ import {
   ParallelSection,
   SankeySection,
   DoubleYAxisSection,
-  RelationGraphSection,
-  ExcelSection
+  RelationGraphSection
 } from './specs'
 
 interface ISpecSectionProps {
@@ -58,10 +57,6 @@ export class SpecSection extends React.PureComponent<ISpecSectionProps, {}> {
         break
       case 'relationGraph':
         renderHtml = <RelationGraphSection spec={config} title={title} onChange={this.specChange}/>
-        break
-      case 'excel':
-        // excel类型不在visualis中展示样式
-        renderHtml = <div />
         break
       default:
         renderHtml = <div />

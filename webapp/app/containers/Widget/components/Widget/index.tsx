@@ -258,16 +258,10 @@ export class Widget extends React.Component<
       waterMaskWidth
     }
 
-    // visualis和datawrangler测试环境不一样，所以测试环境下要写死这个ip
-    const dataWranglerUrl = `http://dataWranglerServerIp:dataWranglerServerPort/#/sheet/add?simpleMode=true&showBottomBar=false&readonly=true&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
     return (
       <div className={styles.wrapper + ' widget-class'} ref={this.container} id="widget" style={{overflowX: 'auto', overflowY: 'hidden'}}>
         <WaterMask {...waterMaskProps} />
-        { selectedChart === 19 && mode === 'chart' ? 
-          <iframe src={dataWranglerUrl} width="100%" height="100%" frameBorder="0" id="dataWrangler"></iframe>
-          :
-          widgetContent
-        }
+        { widgetContent }
         {loading}
         {/* 表格暂无数据时的提示，有了进度条就不需要了 */}
         {/* {empty} */}

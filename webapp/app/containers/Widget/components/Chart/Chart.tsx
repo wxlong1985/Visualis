@@ -26,9 +26,6 @@ export class Chart extends React.PureComponent<IChartProps> {
 
     if (renderType === 'loading') return
 
-    // excel类型，不需要加载echarts相关内容
-    if (selectedChart === 19) return
-
     if (!this.instance) {
       this.instance = echarts.init(this.container, 'default')
     } else {
