@@ -105,6 +105,24 @@ const rootRoute = {
   }
 }
 
+// 第一次访问页面时，记录下url里的env参数值，如果没有env参数，window.apiEnv='dev'，如果有env参数，window.apiEnv=参数的值
+// 在所有的请求里，如果是post请求，在body里加上'labels':{'route':`${window.apiEnv}`}，如果是get请求，在queryString里加上labelsRoute=window.apiEnv
+if (location.href.indexOf('?') !== -1) {
+  // 说明url里有参数
+  const querys = location.href.split('?')[1].split('&')
+  for (let i = 0; i < querys.length; i++) {
+    if (querys[i].split('=')[0] === 'env') {
+      window.apiEnv = querys[i].split('=')[1]
+      break
+    }
+    if (i === querys.length - 1) {
+      window.apiEnv = 'dev'
+    }
+  }
+} else {
+  window.apiEnv = 'dev'
+}
+
 const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>

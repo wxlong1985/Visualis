@@ -118,6 +118,9 @@ if (location.href.indexOf('?') !== -1) {
       window.apiEnv = querys[i].split('=')[1]
       break
     }
+    if (i === querys.length - 1) {
+      window.apiEnv = 'dev'
+    }
   }
 } else {
   window.apiEnv = 'dev'
