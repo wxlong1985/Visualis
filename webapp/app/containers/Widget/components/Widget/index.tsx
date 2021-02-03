@@ -259,7 +259,7 @@ export class Widget extends React.Component<
     }
 
     // visualis和datawrangler测试环境不一样，所以测试环境下要写死这个ip
-    const dataWranglerUrl = `http://dataWranglerServerIp:dataWranglerServerPort/#/sheet/add?simpleMode=true&showBottomBar=false&readonly=true&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
+    const dataWranglerUrl = `http://dataWranglerServerIp:dataWranglerServerPort/#/sheet/add?simpleMode=true&showBottomBar=false&readOnly=true&showChangeModeButton=false&visualisData=${JSON.stringify(visualisData)}`
     return (
       <div className={styles.wrapper + ' widget-class'} ref={this.container} id="widget" style={{overflowX: 'auto', overflowY: 'hidden'}}>
         <WaterMask {...waterMaskProps} />
