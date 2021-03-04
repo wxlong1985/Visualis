@@ -105,6 +105,7 @@ export function* getBaseInfo (action) {
   const { resolve } = action.payload
   // 这里比较特殊 是请求dss的接口 地址要换下
   let url = api.projects
+  console.log('url: ', url);
   url = url.replace('rest_s', 'rest_j')
   url = url.replace('visualis', 'dss')
   url = url.replace('projects', 'getBaseInfo')

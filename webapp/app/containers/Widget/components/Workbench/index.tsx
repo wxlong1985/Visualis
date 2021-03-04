@@ -12,7 +12,7 @@ import viewSaga from 'containers/View/sagas'
 import formReducer from 'containers/Dashboard/FormReducer'
 import { hideNavigator } from 'containers/App/actions'
 import { ViewActions } from 'containers/View/actions'
-const { loadViews, loadViewsDetail, loadViewData, executeQuery, getProgress, getResult, killExecute, loadViewDistinctValue } = ViewActions
+const { loadViews, loadViewsDetail, loadViewData, loadEngines, executeQuery, getProgress, getResult, killExecute, loadViewDistinctValue } = ViewActions
 import { addWidget, editWidget, loadWidgetDetail, clearCurrentWidget, executeComputed } from 'containers/Widget/actions'
 import { makeSelectCurrentWidget, makeSelectLoading, makeSelectDataLoading, makeSelectDistinctColumnValues, makeSelectColumnValueLoading } from 'containers/Widget/selectors'
 import { makeSelectViews, makeSelectFormedViews } from 'containers/View/selectors'
@@ -68,6 +68,10 @@ interface IWorkbenchProps {
     requestParams: IDataRequestParams,
     resolve: (data) => void,
     reject: (error) => void
+  ) => void
+  onLoadEngines: (
+    viewId: number,
+    resolve: (data) => void,
   ) => void
   // widget页面 提交查询数据接口
   onExecuteQuery: (
@@ -839,6 +843,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       distinctColumnValues,
       columnValueLoading,
       onLoadViewData,
+      onLoadEngines,
       onExecuteQuery,
       onGetProgress,
       onGetResult,
@@ -937,6 +942,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
                 onSetComputed={this.setComputed}
                 onDeleteComputed={this.deleteComputed}
                 onLoadData={onLoadViewData}
+                onLoadEngines={onLoadEngines}
                 onExecuteQuery={onExecuteQuery}
                 onGetProgress={onGetProgress}
                 onGetResult={onGetResult}
@@ -1002,6 +1008,7 @@ export function mapDispatchToProps (dispatch) {
     onLoadViewDetail: (viewId, resolve) => dispatch(loadViewsDetail([viewId], resolve)),
     onLoadWidgetDetail: (id, resolve) => dispatch(loadWidgetDetail(id, resolve)),
     onLoadViewData: (viewId, requestParams, resolve, reject) => dispatch(loadViewData(viewId, requestParams, resolve, reject)),
+    onLoadEngines: (viewId, resolve) => dispatch(loadEngines(viewId, resolve)),
     // widget页面 提交查询数据接口
     onExecuteQuery: (viewId, requestParams, resolve, reject) => dispatch(executeQuery(viewId, requestParams, resolve, reject)),
     // widget页面 进度查询接口

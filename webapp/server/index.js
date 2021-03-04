@@ -24,6 +24,7 @@ var options = {
   changeOrigin: true,               // 默认false，是否需要改变原始主机头为目标URL
   pathRewrite: {
       '^/api' : '/api/rest_s/v1/visualis',     // 重写请求，比如我们源访问的是api/old-path，那么请求会被解析为/api/new-path
+      '^/restj' : '/api/rest_j/v1/visualis',     // 重写请求，比如我们源访问的是api/old-path，那么请求会被解析为/api/new-path
       '^/login': '/somePath'      // 获取cookie的登录地址
   }
 }
@@ -31,6 +32,7 @@ var options = {
 var exampleProxy = proxy(options);
 
 app.use('/api', exampleProxy);
+app.use('/restj', exampleProxy);
 app.use('/login', exampleProxy);
 
 // In production we need to pass these values in instead of relying on webpack

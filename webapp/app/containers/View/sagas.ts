@@ -204,6 +204,36 @@ export function* getViewData (action: ViewActionType) {
   }
 }
 
+export function* loadEngines (action: ViewActionType) {
+  if (action.type !== ActionTypes.LOAD_ENGINES) { return }
+  let { viewId, resolve } = action.payload
+  console.log('saga viewId: ', viewId);
+  const { enginesLoaded, loadEnginesFail } = ViewActions
+  try {
+    const asyncData = yield call(request, {
+      method: 'get',
+      url: `/restj/view/enginetypes?id=${viewId}`,
+    })
+    yield put(enginesLoaded())
+    // asyncData.payload可能为""
+    console.log('asyncData: ', asyncData);
+    if (asyncData.data) {
+      console.log('saga asyncData.data: ', asyncData.data);
+      resolve(asyncData.data)
+    } else {
+      resolve({})
+    }
+  } catch (err) {
+    let { response } = err as AxiosError
+    // 增加为空时的处理
+    if (!response) response = {data: {}}
+    const { data } = response as AxiosResponse<IDavinciResponse<any>>
+    yield put(loadEnginesFail(err))
+    reject(data.header)
+  }
+}
+
+
 export function* executeQuery (action: ViewActionType) {
   if (action.type !== ActionTypes.EXECUTE_QUERY) { return }
   let { id, requestParams, resolve, reject } = action.payload
@@ -591,6 +621,7 @@ export default function* rootViewSaga () {
     takeLatest(ActionTypes.EXECUTE_SQL, executeSql),
 
     takeEvery(ActionTypes.LOAD_VIEW_DATA, getViewData),
+    takeEvery(ActionTypes.LOAD_ENGINES, loadEngines),
     takeEvery(ActionTypes.EXECUTE_QUERY, executeQuery),
     takeEvery(ActionTypes.GET_PROGRESS, getProgress),
     takeEvery(ActionTypes.GET_RESULT, getResult),

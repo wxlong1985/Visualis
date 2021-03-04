@@ -622,6 +622,28 @@ export const ViewActions = {
       }
     }
   },
+  loadEngines (viewId, resolve) {
+    return {
+      type: ActionTypes.LOAD_ENGINES,
+      payload: {
+        viewId,
+        resolve
+      }
+    }
+  },
+  enginesLoaded () {
+    return {
+      type: ActionTypes.LOAD_ENGINES_SUCCESS,
+    }
+  },
+  loadEnginesFail (errorMessage: string) {
+    return {
+      type: ActionTypes.LOAD_ENGINES_FAILURE,
+      payload: {
+        errorMessage
+      }
+    }
+  },
 
   loadViewGetProgress (
     execId,

@@ -104,6 +104,10 @@ interface IOperatingPanelProps {
     resolve: (data) => void,
     reject: (error) => void
   ) => void
+  onLoadEngines: (
+    viewId: number,
+    resolve: (data) => void,
+  ) => void
   // widget页面 提交查询数据接口
   onExecuteQuery: (
     viewId: number,
@@ -156,6 +160,7 @@ interface IOperatingPanelStates {
 
   computedConfigModalVisible: boolean
   selectedComputed: object
+  engines: []
 }
 
 export class OperatingPanel extends React.Component<IOperatingPanelProps, IOperatingPanelStates> {
@@ -191,7 +196,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       categoryDragItems: [],
       valueDragItems: [],
       computedConfigModalVisible: false,
-      selectedComputed: null
+      selectedComputed: null,
+      engines: []
     }
   }
 
@@ -415,6 +421,19 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
         if (chartStyles.table && widgetProps && widgetProps.chartStyles.table) chartStyles.table.headerConfig = widgetProps.chartStyles.table.headerConfig
         // 要用widgetProps而不是originalProps里的数据，不然在还未查询出数据时就切换图表驱动和透视驱动就会报错
         this.setWidgetProps(mergedDataParams, widgetProps.chartStyles)
+      })
+    }
+
+    console.log('0988899989selectedView: ', selectedView);
+    if (selectedView) {
+      console.log(112121);
+      const tempId = selectedView.id ? selectedView.id : 0
+      console.log('tempId: ', tempId);
+      this.props.onLoadEngines(tempId, (data) => {
+        console.log('data: ', data);
+        this.setState({
+          engines: data.engineTypes ? data.engineTypes : []
+        })
       })
     }
   }
@@ -1909,6 +1928,10 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     )
   }
 
+  private changeEngine = (value) => {
+    console.log('changeEngine value: ', value);
+  }
+
   public render () {
     const {
       views,
@@ -1953,7 +1976,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       controlConfigVisible,
       valueDragItems,
       computedConfigModalVisible,
-      selectedComputed
+      selectedComputed,
+      engines
     } = this.state
     const widgetPropsModel = selectedView && selectedView.model ? selectedView.model : {}
 
@@ -2068,6 +2092,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     }
     // 中间栏的数据/样式/配置里的内容
     let tabPane
+    console.log('render engines: ', engines);
     switch (selectedTab) {
       case 'data':
         tabPane = (
@@ -2244,6 +2269,20 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
                 <Row gutter={8} type="flex" align="middle" className={styles.blockRow}>
                   <Col span={24}>
                     <Button size="small" onClick={this.clearCache}>清理缓存</Button>
+                  </Col>
+                </Row>
+              </div>
+            </div>
+            <div className={styles.paneBlock}>
+              <h4>查询引擎</h4>
+              <div className={styles.blockBody}>
+                <Row gutter={8} type="flex" align="middle" className={styles.blockRow}>
+                  <Col span={24}>
+                    <Select size="small" style={{ width: 150 }} placeholder="请选择引擎" onChange={this.changeEngine}>
+                      {engines.map((o) => {
+                        return <Option key={o} value={o}>{o}</Option>
+                      })}
+                    </Select>
                   </Col>
                 </Row>
               </div>
