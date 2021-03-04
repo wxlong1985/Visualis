@@ -63,9 +63,19 @@ export default function request (url: any, options?: AxiosRequestConfig): AxiosP
       }
     } else {
       if (url.data) {
-        url.data.labels = { route: window.apiEnv }
+        // 如果data是array的，则像get请求一样在query里加
+        if (Array.isArray(url.data)) {
+          if (url.url.split('?').length > 1) {
+            // 说明本身是有query的
+            tempUrl.url += `&labelsRoute=${window.apiEnv}`
+          } else {
+            tempUrl.url += `?labelsRoute=${window.apiEnv}`
+          }
+        } else {
+          tempUrl.data.labels = { route: window.apiEnv }
+        }
       } else {
-        url.data = {
+        tempUrl.data = {
           labels: {
             route: window.apiEnv
           }
