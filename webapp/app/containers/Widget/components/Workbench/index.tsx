@@ -115,6 +115,7 @@ interface IWorkbenchStates {
   contextId: string
   nodeName: string
   view: object
+  engine: string
 }
 
 const SplitPane = React.lazy(() => import('react-split-pane'))
@@ -194,7 +195,8 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       */
       contextId: '',
       nodeName: '',
-      view: {}
+      view: {},
+      engine: ''
     }
   }
 
@@ -288,11 +290,13 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       // 只有编辑页面，需要请求widget的detail，请求回来之后，会触发componentWillReceiveProps，currentWidget会变为widget的detail
       if (params.wid !== 'add' && !Number.isNaN(Number(params.wid))) {
         onLoadWidgetDetail(Number(params.wid), (data) => {
-          const { contextId, nodeName, view } = JSON.parse(data.config)
+          const { contextId, nodeName, view, engine } = JSON.parse(data.config)
+          console.log('parse engine: ', engine);
           // 全局保存下来，保存widget的时候要用
           this.setState({
             contextId,
-            nodeName
+            nodeName,
+            engine
           })
           if (Object.keys(this.view).length > 0 && this.urlHasView) {
             // 如果url里有view，说明this.view是不为空的对象，这时候以this.view为准，直接用该view作为当前页面的view，onLoadWidgetDetail调用成功后会调用componentWillReceiveProps，在componentWillReceiveProps里面将this.urlView更新，所以在这里无需进行设置
@@ -637,7 +641,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
   // 点击widget编辑页面右上角的保存
   private saveWidget = () => {
     const { params, onAddWidget, onEditWidget } = this.props
-    const { id, name, description, selectedViewId, controls, cache, expired, widgetProps, computed, originalComputed, autoLoadData, contextId, nodeName } = this.state
+    const { id, name, description, selectedViewId, controls, cache, expired, widgetProps, computed, originalComputed, autoLoadData, contextId, nodeName, engine } = this.state
     if (!name.trim()) {
       message.error('Widget名称不能为空')
       return
@@ -667,7 +671,8 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
         query: this.queryData,
         view: this.view,
         contextId,
-        nodeName
+        nodeName,
+        engine
       }),
       publish: true
     }
@@ -834,6 +839,11 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
     })
   }
 
+  private setEngine = (val) => {
+    console.log('setEngine val: ', val);
+    this.setState({ engine: val })
+  }
+
   public render () {
     const {
       views,
@@ -868,6 +878,7 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       settingFormVisible,
       settings,
       isFold,
+      engine
     } = this.state
     let selectedView = formedViews[selectedViewId]
 
@@ -959,6 +970,8 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
                 collapsed={this.collapsed}
                 // 如果url中有view的话，要进行特殊的配置
                 view={this.view}
+                setEngine={this.setEngine}
+                engine={engine}
               />
               <div className={styles.viewPanel}>
                 <div className={styles.widgetBlock}>

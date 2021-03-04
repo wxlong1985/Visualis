@@ -125,6 +125,8 @@ interface IOperatingPanelProps {
   onLoadDistinctValue: (viewId: number, params: Partial<IDistinctValueReqeustParams>) => void,
   onBeofreDropColunm: (view: IView, resolve: () => void) => void
   changeGetProgressPercent: (percent: number) => void
+  setEngine: (val: string) => void
+  engine: string
 }
 
 interface IOperatingPanelStates {
@@ -315,7 +317,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       if (this.props.originalWidgetProps && Object.keys(this.state.styleParams)[0] !== Object.keys(originalWidgetProps.chartStyles)[0]) return
       // Object.keys(this.state.styleParams)[0] === Object.keys(originalWidgetProps.chartStyles)[0] 是保证当前操作的图表的类型和originalWidgetProps里对应的图表类型是一致的，比如从透视驱动表格切到图表驱动表格后，originalWidgetProps.chartStyles里是pivot，但是this.state.styleParams里是table，这个时候就不需要执行这个if里的逻辑了，因为下面是用originalWidgetProps来更新的，执行的话就会出现透视驱动表格切换到图表驱动表格然后拖拽字段后自动切回透视驱动的bug
       const { rows, secondaryMetrics, filters, color, label, size, xAxis, tip, chartStyles, mode, selectedChart } = originalWidgetProps
-      const { cols, metrics } = widgetProps
+      const { cols, metrics, engine } = widgetProps
 
       const { dataParams } = this.state
       const model = selectedView.model
@@ -419,18 +421,16 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       }, () => {
         // 这里需要widgetProps.chartStyles.table.headerConfig而不是originalWidgetProps.chartStyles.table.headerCon而不是
         if (chartStyles.table && widgetProps && widgetProps.chartStyles.table) chartStyles.table.headerConfig = widgetProps.chartStyles.table.headerConfig
+        console.log(11111111);
         // 要用widgetProps而不是originalProps里的数据，不然在还未查询出数据时就切换图表驱动和透视驱动就会报错
-        this.setWidgetProps(mergedDataParams, widgetProps.chartStyles)
+        this.setWidgetProps(mergedDataParams, widgetProps.chartStyles, {engine})
       })
     }
 
-    console.log('0988899989selectedView: ', selectedView);
     if (selectedView) {
-      console.log(112121);
       const tempId = selectedView.id ? selectedView.id : 0
-      console.log('tempId: ', tempId);
       this.props.onLoadEngines(tempId, (data) => {
-        console.log('data: ', data);
+        // 切换view时不用清空this.props.engine
         this.setState({
           engines: data.engineTypes ? data.engineTypes : []
         })
@@ -1132,6 +1132,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       renderType?: RenderType,
       updatedPagination?: IPaginationParams,
       queryMode?: WorkbenchQueryMode,
+      engine?: string,
       orders?
     }
   ) => {
@@ -1289,6 +1290,12 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
     // 如果有view，就把view放进requestParams才能正常请求
     if (Object.keys(view).length > 0) requestParams.view = view
+
+    console.log('this.props.engine: ', this.props.engine);
+    if (options) console.log('optios.engine: ', options.engine);
+    console.log('this.props.widgetProps.engine: ', this.props.widgetProps.engine);
+    console.log('this.props.originalWidgetProps.engine: ', this.props.originalWidgetProps.engine);
+    if (this.props.engine) requestParams.engineType=this.props.engine
 
     if (options) {
       if (options.orders) {
@@ -1930,6 +1937,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
   private changeEngine = (value) => {
     console.log('changeEngine value: ', value);
+    this.props.setEngine(value)
   }
 
   public render () {
@@ -1952,7 +1960,8 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       originalComputed,
       isFold,
       onChangeIsFold,
-      view
+      view,
+      engine
     } = this.props
     const {
       dragged,
@@ -2278,7 +2287,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
               <div className={styles.blockBody}>
                 <Row gutter={8} type="flex" align="middle" className={styles.blockRow}>
                   <Col span={24}>
-                    <Select size="small" style={{ width: 150 }} placeholder="请选择引擎" onChange={this.changeEngine}>
+                    <Select size="small" style={{ width: 150 }} defaultValue={engine} placeholder="请选择引擎" onChange={this.changeEngine}>
                       {engines.map((o) => {
                         return <Option key={o} value={o}>{o}</Option>
                       })}

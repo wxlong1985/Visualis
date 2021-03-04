@@ -207,7 +207,6 @@ export function* getViewData (action: ViewActionType) {
 export function* loadEngines (action: ViewActionType) {
   if (action.type !== ActionTypes.LOAD_ENGINES) { return }
   let { viewId, resolve } = action.payload
-  console.log('saga viewId: ', viewId);
   const { enginesLoaded, loadEnginesFail } = ViewActions
   try {
     const asyncData = yield call(request, {
@@ -216,9 +215,7 @@ export function* loadEngines (action: ViewActionType) {
     })
     yield put(enginesLoaded())
     // asyncData.payload可能为""
-    console.log('asyncData: ', asyncData);
     if (asyncData.data) {
-      console.log('saga asyncData.data: ', asyncData.data);
       resolve(asyncData.data)
     } else {
       resolve({})

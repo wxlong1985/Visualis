@@ -336,7 +336,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
 
     const widget = widgets.find((w) => w.id === widgetId)
     const widgetConfig: IWidgetConfig = JSON.parse(widget.config)
-    const { cols, rows, metrics, secondaryMetrics, filters, color, label, size, xAxis, tip, orders, cache, expired, view } = widgetConfig
+    const { cols, rows, metrics, secondaryMetrics, filters, color, label, size, xAxis, tip, orders, cache, expired, view, engine } = widgetConfig
     const updatedCols = cols.map((col) => widgetDimensionMigrationRecorder(col))
     const updatedRows = rows.map((row) => widgetDimensionMigrationRecorder(row))
     const customOrders = updatedCols.concat(updatedRows)
@@ -449,6 +449,8 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
       customOrders
     }
     if (typeof view === 'object' && Object.keys(view).length > 0) requestParams.view = view
+
+    if (engine) requestParams.engineType = engine
 
     if (tempOrders) {
       requestParams.orders = requestParams.orders.concat(tempOrders)
