@@ -421,7 +421,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       }, () => {
         // 这里需要widgetProps.chartStyles.table.headerConfig而不是originalWidgetProps.chartStyles.table.headerCon而不是
         if (chartStyles.table && widgetProps && widgetProps.chartStyles.table) chartStyles.table.headerConfig = widgetProps.chartStyles.table.headerConfig
-        console.log(11111111);
         // 要用widgetProps而不是originalProps里的数据，不然在还未查询出数据时就切换图表驱动和透视驱动就会报错
         this.setWidgetProps(mergedDataParams, widgetProps.chartStyles, {engine})
       })
@@ -1291,11 +1290,14 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     // 如果有view，就把view放进requestParams才能正常请求
     if (Object.keys(view).length > 0) requestParams.view = view
 
-    console.log('this.props.engine: ', this.props.engine);
-    if (options) console.log('optios.engine: ', options.engine);
-    console.log('this.props.widgetProps.engine: ', this.props.widgetProps.engine);
-    console.log('this.props.originalWidgetProps.engine: ', this.props.originalWidgetProps.engine);
-    if (this.props.engine) requestParams.engineType=this.props.engine
+    // 第一次进入编辑页面时，如果本身选了引擎，但这时候可能因为this.props.engine还没更新，所以this.props.engine为''，但this.props.originalWidgetProps.engine不为''
+    // 如果this.props.engine和this.props.originalWidgetProps.engine都为''，说明没有选过引擎，用this.props.engine就行了
+    // 如果this.props.engine不为''，则使用this.props.engine的值
+    if (this.props.engine === '' && this.props.originalWidgetProps && this.props.originalWidgetProps.engine !== '') {
+      requestParams.engineType = this.props.originalWidgetProps.engine
+    } else {
+      if (this.props.engine) requestParams.engineType = this.props.engine
+    }
 
     if (options) {
       if (options.orders) {
@@ -1936,7 +1938,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
   }
 
   private changeEngine = (value) => {
-    console.log('changeEngine value: ', value);
     this.props.setEngine(value)
   }
 
@@ -2101,7 +2102,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     }
     // 中间栏的数据/样式/配置里的内容
     let tabPane
-    console.log('render engines: ', engines);
     switch (selectedTab) {
       case 'data':
         tabPane = (

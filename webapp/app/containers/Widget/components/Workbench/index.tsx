@@ -291,7 +291,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
       if (params.wid !== 'add' && !Number.isNaN(Number(params.wid))) {
         onLoadWidgetDetail(Number(params.wid), (data) => {
           const { contextId, nodeName, view, engine } = JSON.parse(data.config)
-          console.log('parse engine: ', engine);
           // 全局保存下来，保存widget的时候要用
           this.setState({
             contextId,
@@ -840,7 +839,6 @@ export class Workbench extends React.Component<IWorkbenchProps, IWorkbenchStates
   }
 
   private setEngine = (val) => {
-    console.log('setEngine val: ', val);
     this.setState({ engine: val })
   }
 
