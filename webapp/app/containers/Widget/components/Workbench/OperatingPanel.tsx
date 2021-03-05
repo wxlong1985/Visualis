@@ -638,7 +638,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
     }
   }
 
-  // 拖拽某一个维度或指标或筛选之后在盒子里放下时
+  // 拖拽一个或多个维度或指标或筛选之后在盒子里放下时
   private drop = (name: string, dropIndex: number, dropType: DropType, changedItems: IDataParamSource[], config?: IDataParamConfig) => {
     const { multiDrag } = this.props
     const {
@@ -657,7 +657,6 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
 
     const multiDragCategoryDropboxNames = ['cols', 'rows']
     const multiDragValueDropboxNames = ['metrics', 'secondaryMetrics']
-
     if (multiDrag
         && dropType === 'outside'
         && multiDragCategoryDropboxNames.concat(multiDragValueDropboxNames).includes(name)) {
@@ -665,20 +664,26 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       if (multiDragCategoryDropboxNames.includes(name)) {
         selectedItems = selectedItems.concat(
           categoryDragItems
-            .filter((item) => item.checked && item.name !== dragged.name && !items.find((i) => i.name === item.name))
+            .filter((item) => item.checked && !items.find((i) => i.name === item.name))
             .map(({ checked, ...rest }) => ({...rest}))
-            .concat(dragged)
         )
+        const tempNames = []
+        selectedItems.forEach((obj) => tempNames.push(obj.name))
+        // 多选时，dragged会重复一次，所以要先判断
+        if (!tempNames.includes(dragged.name)) selectedItems = selectedItems.concat(dragged)
         this.setState({
           categoryDragItems: categoryDragItems.map((item) => ({ ...item, checked: false }))
         })
       } else if (multiDragValueDropboxNames.includes(name)) {
         selectedItems = selectedItems.concat(
           valueDragItems
-            .filter((item) => item.checked && item.name !== decodeMetricName(dragged.name))
+            .filter((item) => item.checked)
             .map(({ checked, ...rest }): IDataParamSource => ({...rest, name: encodeMetricName(rest.name), agg: 'sum', chart: getPivot()}))
-            .concat({...dragged, chart: getPivot()})
           )
+        const tempNames = []
+        selectedItems.forEach((obj) => tempNames.push(decodeMetricName(obj.name)))
+        // 多选时，dragged会重复一次，所以要先判断
+        if (!tempNames.includes(decodeMetricName(dragged.name))) selectedItems = selectedItems.concat({...dragged, chart: getPivot()})
         this.setState({
           valueDragItems: valueDragItems.map((item) => ({ ...item, checked: false }))
         })
