@@ -211,7 +211,10 @@ export function* loadEngines (action: ViewActionType) {
   try {
     const asyncData = yield call(request, {
       method: 'get',
-      url: `/restj/view/enginetypes?id=${viewId}`,
+      // 打包时用
+      url: `/api/rest_j/v1/visualis/view/enginetypes?id=${viewId}`,
+      // 本地开发时用
+      // url: `/restj/view/enginetypes?id=${viewId}`,
     })
     yield put(enginesLoaded())
     // asyncData.payload可能为""
