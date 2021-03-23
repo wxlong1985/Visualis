@@ -820,11 +820,23 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
       if (this.state.currentSelectedKeys.includes(config.key)) {
         tempConfig[index].style = this.state.styleChangeDefaultConfig[0].style
       }
+      this.setChildrenStyle(config)
     })
     this.setState({
       localConfig: tempConfig,
       styleChangeModalVisible: false
     })
+  }
+
+  private setChildrenStyle = (item) => {
+    if (Array.isArray(item.children) && item.children.length > 0) {
+      for (let i = 0; i < item.children.length; i++) {
+        if (this.state.currentSelectedKeys.includes(item.children[i].key)) {
+          item.children[i].style = this.state.styleChangeDefaultConfig[0].style
+        }
+        if (Array.isArray(item.children[i].children) && item.children[i].children.length > 0) this.setChildrenStyle(item.children[i])
+      }
+    }
   }
 
   // 点击 批量修改样式 弹框的Cancel
@@ -896,6 +908,7 @@ class HeaderConfigModal extends React.PureComponent<IHeaderConfigModalProps, IHe
         <div className={wrapTableCls}>
           <Row gutter={8} className={stylesConfig.rowBlock}>
             <Col span={24}>
+              {/* 这个Table的rowSelection逻辑是，父和子节点是单独被选中，如果选中父节点，子节点不会被同时联动选中，各个节点的选中逻辑是单独的 */}
               <Table
                 bordered={true}
                 pagination={false}
