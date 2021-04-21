@@ -38,6 +38,8 @@ import { getFormattedValue } from '../../components/Config/Format'
 const defaultTheme = require('assets/json/echartsThemes/default.project.json')
 const defaultThemeColors = defaultTheme.theme.color
 
+const DEFAULT_DISTANCE = 15
+
 export default function (chartProps: IChartProps, drillOptions?: any) {
   const { data, cols, metrics, chartStyles, color, tip } = chartProps
 
@@ -95,8 +97,8 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
           sampling: 'average',
           data: v.map((g, index) => {
             // 每次还原distance默认值
-            if (labelOption.label && labelOption.label.normal) labelOption.label.normal.distance = 15
-            if (labelOption.label && labelOption.label.emphasis) labelOption.label.emphasis.distance = 15
+            if (labelOption.label && labelOption.label.normal) labelOption.label.normal.distance = DEFAULT_DISTANCE
+            if (labelOption.label && labelOption.label.emphasis) labelOption.label.emphasis.distance = DEFAULT_DISTANCE
             // dataArr应该是[[1,2],[3,4]]这样的数据结构
             if (!dataArr[index]) {
               dataArr.push([g[`${m.agg}(${decodedMetricName})`]])
@@ -111,11 +113,11 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 if (labelOption.label && labelOption.label.normal) {
                   // 必须要创建一个新的对象，不然直接更改labelOption会污染到其他线的labelOption
                   tempLabelOption = JSON.parse(JSON.stringify(labelOption))
-                  tempLabelOption.label.normal.distance += similarCount * 15
+                  tempLabelOption.label.normal.distance += similarCount * DEFAULT_DISTANCE
                 }
                 if (labelOption.label && labelOption.label.emphasis) {
                   tempLabelOption = JSON.parse(JSON.stringify(labelOption))
-                  tempLabelOption.label.emphasis.distance += similarCount * 15
+                  tempLabelOption.label.emphasis.distance += similarCount * DEFAULT_DISTANCE
                 }
                 dataArr[index].push(g[`${m.agg}(${decodedMetricName})`])
               }
@@ -173,8 +175,8 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
         sampling: 'average',
         data: data.map((g, index) => {
           // 每次还原distance默认值
-          if (labelOption.label && labelOption.label.normal) labelOption.label.normal.distance = 15
-          if (labelOption.label && labelOption.label.emphasis) labelOption.label.emphasis.distance = 15
+          if (labelOption.label && labelOption.label.normal) labelOption.label.normal.distance = DEFAULT_DISTANCE
+          if (labelOption.label && labelOption.label.emphasis) labelOption.label.emphasis.distance = DEFAULT_DISTANCE
           // dataArr应该是[[1,2],[3,4]]这样的数据结构
           if (!dataArr[index]) {
             dataArr.push([g[`${m.agg}(${decodedMetricName})`]])
@@ -190,11 +192,11 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
                 if (labelOption.label.normal) {
                   // 必须要创建一个新的对象，不然直接更改labelOption会污染到其他线的labelOption
                   tempLabelOption = JSON.parse(JSON.stringify(labelOption))
-                  tempLabelOption.label.normal.distance += similarCount * 15
+                  tempLabelOption.label.normal.distance += similarCount * DEFAULT_DISTANCE
                 }
                 if (labelOption.label.emphasis) {
                   tempLabelOption = JSON.parse(JSON.stringify(labelOption))
-                  tempLabelOption.label.emphasis.distance += similarCount * 15
+                  tempLabelOption.label.emphasis.distance += similarCount * DEFAULT_DISTANCE
                 }
               }
               dataArr[index].push(g[`${m.agg}(${decodedMetricName})`])
@@ -318,5 +320,6 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
       xAxisData
     )
   }
+  console.log('options: ', options);
   return options
 }

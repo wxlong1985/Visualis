@@ -5,6 +5,8 @@ import ColorPicker from 'components/ColorPicker'
 import { PIVOT_CHART_FONT_FAMILIES, PIVOT_CHART_LINE_STYLES, PIVOT_CHART_FONT_SIZES } from 'app/globalConstants'
 import { getCorrectInputNumber } from '../../util'
 const styles = require('../Workbench.less')
+import { NumericUnitList, FieldFormatTypes } from '../../Config/Format/constants'
+import { getFormattedValue } from '../../Config/Format'
 
 export interface IAxisConfig {
   inverse: boolean
@@ -55,6 +57,19 @@ export class AxisSection extends React.PureComponent<IAxisSectionProps, {}> {
   private colorChange = (prop) => (color) => {
     this.props.onChange(prop, color)
   }
+
+  private format = (prop) => (value) => {
+    console.log('prop: ', prop);
+    console.log('value: ', value);
+
+    if (prop === 'digit' && value >= 0 && value <= 6) {
+      // 小数位数
+    }
+  }
+
+  private numericUnitOptions = NumericUnitList.map((item) => (
+    <Option key={item} value={item}>{item}</Option>
+  ))
 
   public render () {
     const { title, config } = this.props
@@ -230,6 +245,32 @@ export class AxisSection extends React.PureComponent<IAxisSectionProps, {}> {
             value={max}
             onChange={this.inputNumberChange('max')}
           />
+        </Col>
+      </Row>
+    ), (
+      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+        <Col span={12}>小数位数</Col>
+        <Col span={10}>
+          <InputNumber min={0} max={6} className={styles.blockElm} onChange={this.format('digit')} />
+        </Col>
+      </Row>
+    ), (
+      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+        <Col span={12}>单位</Col>
+        <Col span={10}>
+          <Select className={styles.blockElm}>{this.numericUnitOptions}</Select>
+        </Col>
+      </Row>
+    ), (
+      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+        <Col span={20}>
+          <Checkbox className={styles.blockElm}>使用千分位分隔符</Checkbox>
+        </Col>
+      </Row>
+    ), (
+      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+        <Col span={20}>
+          <Checkbox className={styles.blockElm}>使用万分位分隔符</Checkbox>
         </Col>
       </Row>
     )]

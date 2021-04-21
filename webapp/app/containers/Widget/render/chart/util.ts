@@ -141,6 +141,18 @@ export function getMetricAxisOption (
     lineColor
   } = splitLineConfig
 
+  let tempFormatter = undefined
+  if (percentage) {
+    tempFormatter = '{value}%'
+  } else {
+    tempFormatter = metricAxisLabelFormatter
+  }
+
+
+  console.log('min: ', min);
+  console.log('max: ', max);
+  console.log('tempFormatter: ', tempFormatter);
+
   return {
     type: 'value',
     inverse,
@@ -151,7 +163,7 @@ export function getMetricAxisOption (
       color: labelColorY,
       fontFamily: labelFontFamilyY,
       fontSize: Number(labelFontSizeY),
-      formatter: percentage ? '{value}%' : metricAxisLabelFormatter
+      formatter: tempFormatter
     },
     axisLine: {
       show: showLineY,

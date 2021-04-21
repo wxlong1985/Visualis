@@ -212,7 +212,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
       slideParams: {},
       currentLocalLayers: [],
       zoomRatio: 1,
-      sliderValue: 20,
+      sliderValue: 100,
       scale: 1,
       settingInfo: {
         key: '',
@@ -1074,6 +1074,7 @@ export class Editor extends React.Component<IEditorProps, IEditorStates> {
           <DisplayContainer
             key="editor"
             slideParams={slideParams}
+            sliderValue={sliderValue}
             zoomRatio={zoomRatio}
             onScaleChange={this.scaleChange}
             onCoverCutCreated={this.coverCutCreated}

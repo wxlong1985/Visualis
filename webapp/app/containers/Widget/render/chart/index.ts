@@ -37,7 +37,6 @@ import { EChartOption } from 'echarts'
 import { IChartProps } from '../../components/Chart'
 
 export default function (type, chartProps: IChartProps, drillOptions?: any): EChartOption {
-
   switch (type) {
     case 'line': return line(chartProps, drillOptions)
     case 'bar': return bar(chartProps, drillOptions)
