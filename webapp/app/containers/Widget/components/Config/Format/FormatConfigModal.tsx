@@ -104,7 +104,6 @@ class FormatConfigForm extends React.PureComponent<IFormatConfigFormProps, IForm
     const config = localConfig[FieldFormatTypes.Numeric]
     const { decimalPlaces, unit, useThousandSeparator } = config
     const { getFieldDecorator } = form
-    console.log('form: ', form);
     const formItems = [(
       <FormItem key={`${FieldFormatTypes.Numeric}.decimalPlaces`} label="小数位数：" {...this.formItemLayout}>
         {getFieldDecorator(`${FieldFormatTypes.Numeric}.decimalPlaces`, {

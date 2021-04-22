@@ -33,6 +33,10 @@ export interface IAxisConfig {
   xAxisRotate?: number
   min?: number
   max?: number
+  digit?: number
+  unit?: string
+  thousand?: boolean
+  tenThousand?: boolean
 }
 
 interface IAxisSectionProps {
@@ -59,11 +63,21 @@ export class AxisSection extends React.PureComponent<IAxisSectionProps, {}> {
   }
 
   private format = (prop) => (value) => {
-    console.log('prop: ', prop);
-    console.log('value: ', value);
 
     if (prop === 'digit' && value >= 0 && value <= 6) {
       // 小数位数
+      this.props.onChange(prop, value)
+    } else if (prop === 'unit') {
+      // 单位
+      this.props.onChange(prop, value)
+    } else if (prop === 'thousand') {
+      // 使用千分位分隔符
+      this.props.onChange(prop, value.target.checked)
+      if (value.target.checked) this.props.onChange('tenThousand', false)
+    } else if (prop === 'tenThousand') {
+      // 使用万分位分隔符
+      this.props.onChange(prop, value.target.checked)
+      if (value.target.checked) this.props.onChange('thousand', false)
     }
   }
 
@@ -98,7 +112,11 @@ export class AxisSection extends React.PureComponent<IAxisSectionProps, {}> {
       xAxisInterval,
       xAxisRotate,
       min,
-      max
+      max,
+      digit,
+      unit,
+      thousand,
+      tenThousand
     } = config
 
     const lineStyles = PIVOT_CHART_LINE_STYLES.map((l) => (
@@ -248,29 +266,29 @@ export class AxisSection extends React.PureComponent<IAxisSectionProps, {}> {
         </Col>
       </Row>
     ), (
-      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+      <Row key="digit" gutter={8} type="flex" align="middle" className={styles.blockRow}>
         <Col span={12}>小数位数</Col>
         <Col span={10}>
-          <InputNumber min={0} max={6} className={styles.blockElm} onChange={this.format('digit')} />
+          <InputNumber min={0} max={5} value={digit} className={styles.blockElm} onChange={this.format('digit')} />
         </Col>
       </Row>
     ), (
-      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+      <Row key="unit" gutter={8} type="flex" align="middle" className={styles.blockRow}>
         <Col span={12}>单位</Col>
         <Col span={10}>
-          <Select className={styles.blockElm}>{this.numericUnitOptions}</Select>
+          <Select className={styles.blockElm} value={unit} onChange={this.format('unit')} >{this.numericUnitOptions}</Select>
         </Col>
       </Row>
     ), (
-      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+      <Row key="thousand" gutter={8} type="flex" align="middle" className={styles.blockRow}>
         <Col span={20}>
-          <Checkbox className={styles.blockElm}>使用千分位分隔符</Checkbox>
+          <Checkbox className={styles.blockElm} checked={thousand} onChange={this.format('thousand')} >使用千分位分隔符</Checkbox>
         </Col>
       </Row>
     ), (
-      <Row key="max" gutter={8} type="flex" align="middle" className={styles.blockRow}>
+      <Row key="tenThousand" gutter={8} type="flex" align="middle" className={styles.blockRow}>
         <Col span={20}>
-          <Checkbox className={styles.blockElm}>使用万分位分隔符</Checkbox>
+          <Checkbox className={styles.blockElm} checked={tenThousand} onChange={this.format('tenThousand')} >使用万分位分隔符</Checkbox>
         </Col>
       </Row>
     )]

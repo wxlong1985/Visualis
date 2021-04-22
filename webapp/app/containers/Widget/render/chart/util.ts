@@ -25,6 +25,7 @@ import { metricAxisLabelFormatter, decodeMetricName, getTextWidth } from '../../
 import { getFormattedValue } from '../../components/Config/Format'
 import { CHART_LEGEND_POSITIONS, DEFAULT_SPLITER } from 'app/globalConstants'
 import { EChartOption } from 'echarts'
+import { isNumber } from '_@types_lodash@4.14.134@@types/lodash/ts3.1'
 
 interface ISplitLineConfig {
   showLine: boolean
@@ -131,7 +132,11 @@ export function getMetricAxisOption (
     nameRotate,
     nameGap,
     min,
-    max
+    max,
+    digit,
+    unit,
+    thousand,
+    tenThousand
   } = metricAxisConfig
 
   const {
@@ -143,15 +148,54 @@ export function getMetricAxisOption (
 
   let tempFormatter = undefined
   if (percentage) {
-    tempFormatter = '{value}%'
-  } else {
-    tempFormatter = metricAxisLabelFormatter
+    // 百分比的形式
+    if (typeof digit !== 'number') {
+      tempFormatter = () => '{value}%'
+    } else {
+      tempFormatter = (value) => `${value.toFixed(digit)}%`
+    }
+  } else if (thousand) {
+    // 如果用了千分位分隔符和万分位分隔符，说明肯定是采用的“无”单位
+    tempFormatter = (value) => {
+      if (isNaN(+value)) { return value }
+      const parts = typeof digit === 'number' ? value.toFixed(digit).toString().split('.') : value.toString().split('.')
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      const formatted = parts.join('.')
+      return formatted
+    }
+  } else if (tenThousand) {
+    tempFormatter = (value) => {
+      if (isNaN(+value)) { return value }
+      const parts = typeof digit === 'number' ? value.toFixed(digit).toString().split('.') : value.toString().split('.')
+      parts[0] = parts[0].replace(/\B(?=(\d{4})+(?!\d))/g, ',')
+      const formatted = parts.join('.')
+      return formatted
+    }
+  } else if (unit) {
+    tempFormatter = (value) => {
+      switch (unit) {
+        case '无':
+          if (typeof digit === 'number') return value.toFixed(digit)
+          return value;
+        case '万':
+          return `${precision(value / Math.pow(10, 4))}万`;;
+        case '亿':
+          return `${precision(value / Math.pow(10, 8))}亿`;;
+        case 'K':
+          return `${precision(value / Math.pow(10, 3))}K`;
+        case 'M':
+          return `${precision(value / Math.pow(10, 6))}M`;
+        case 'G':
+          return `${precision(value / Math.pow(10, 9))}G`;
+        default:
+          return value;
+      }
+      function precision (num) {
+        if (typeof digit === 'number') return num.toFixed(digit)
+        return num >= 10 ? Math.floor(num) : num.toFixed(1)
+      }
+    }
   }
-
-
-  console.log('min: ', min);
-  console.log('max: ', max);
-  console.log('tempFormatter: ', tempFormatter);
 
   return {
     type: 'value',
