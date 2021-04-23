@@ -158,7 +158,6 @@ export default function (chartProps: IChartProps, drillOptions) {
       leftMaxValue = Math.max(...metrics.map((m) => Math.max(...data.map((d) => d[`${m.agg}(${decodeMetricName(m.name)})`]))))
     }
   }
-
   if (rightMax) {
     rightMaxValue = rightMax
   } else {
@@ -205,18 +204,18 @@ export default function (chartProps: IChartProps, drillOptions) {
       {
         type: 'value',
         key: 'yAxisIndex0',
-        min: rightMin ? rightMin : 0,
-        max: rightMaxValue,
-        interval: rightInterval,
+        min: getDefaultValue(rightMin, 0),
+        max: getDefaultValue(rightMaxValue, 9000),
+        interval: getDefaultValue(rightInterval, 3000),
         position: 'right',
         ...getDoubleYAxis(doubleYAxis)
       },
       {
         type: 'value',
         key: 'yAxisIndex1',
-        min: leftMin ? leftMin : 0,
-        max: leftMaxValue,
-        interval: leftInterval,
+        min: getDefaultValue(leftMin, 0),
+        max: getDefaultValue(leftMaxValue, 9000),
+        interval: getDefaultValue(leftInterval, 3000),
         position: 'left',
         ...getDoubleYAxis(doubleYAxis)
       }
@@ -226,6 +225,11 @@ export default function (chartProps: IChartProps, drillOptions) {
     ...legendOption
   }
   return option
+}
+
+function getDefaultValue (value, defaultValue) {
+  if (typeof value === 'number' && !isNaN(value) && value !== Infinity && value !== -Infinity) return value
+  return defaultValue
 }
 
 export function getAixsMetrics (type, axisMetrics, data, stack, labelOption, selectedItems, axisPosition?: {key: string, type: string}) {

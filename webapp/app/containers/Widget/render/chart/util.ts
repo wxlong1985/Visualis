@@ -150,7 +150,7 @@ export function getMetricAxisOption (
   if (percentage) {
     // 百分比的形式
     if (typeof digit !== 'number') {
-      tempFormatter = () => '{value}%'
+      tempFormatter = (value) => `${value}%`
     } else {
       tempFormatter = (value) => `${value.toFixed(digit)}%`
     }
@@ -195,6 +195,12 @@ export function getMetricAxisOption (
         return num >= 10 ? Math.floor(num) : num.toFixed(1)
       }
     }
+  } else {
+    if (typeof digit !== 'number') {
+      tempFormatter = (value) => `${value}`
+    } else {
+      tempFormatter = (value) => `${value.toFixed(digit)}`
+    }
   }
 
   return {
@@ -207,7 +213,10 @@ export function getMetricAxisOption (
       color: labelColorY,
       fontFamily: labelFontFamilyY,
       fontSize: Number(labelFontSizeY),
-      formatter: tempFormatter
+      formatter: tempFormatter,
+      // TODOS： width和overflow不生效，不知道是不是版本问题，晚点再看看
+      width: 80,
+      overflow: 'break'
     },
     axisLine: {
       show: showLineY,
