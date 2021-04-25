@@ -155,7 +155,12 @@ export default function (chartProps: IChartProps, drillOptions) {
     if (stack) {
       leftMaxValue = metrics.reduce((num, m) => num + Math.max(...data.map((d) => d[`${m.agg}(${decodeMetricName(m.name)})`])), 0)
     } else {
-      leftMaxValue = Math.max(...metrics.map((m) => Math.max(...data.map((d) => d[`${m.agg}(${decodeMetricName(m.name)})`]))))
+      leftMaxValue = Math.max(...metrics.map((m) => {
+          return Math.max(...data.map((d) => {
+            return typeof d[`${m.agg}(${decodeMetricName(m.name)})`] === 'number' ? d[`${m.agg}(${decodeMetricName(m.name)})`] : 0
+          }
+        ))}
+      ))
     }
   }
   if (rightMax) {
@@ -164,7 +169,12 @@ export default function (chartProps: IChartProps, drillOptions) {
     if (stack) {
       rightMaxValue = secondaryMetrics.reduce((num, m) => num + Math.max(...data.map((d) => d[`${m.agg}(${decodeMetricName(m.name)})`])), 0)
     } else {
-      rightMaxValue = Math.max(...secondaryMetrics.map((m) => Math.max(...data.map((d) => d[`${m.agg}(${decodeMetricName(m.name)})`]))))
+      rightMaxValue = Math.max(...secondaryMetrics.map((m) => {
+        return Math.max(...data.map((d) => {
+            return typeof d[`${m.agg}(${decodeMetricName(m.name)})`] === 'number' ? d[`${m.agg}(${decodeMetricName(m.name)})`] : 0
+          }
+        ))
+      }))
     }
   }
 
@@ -204,18 +214,18 @@ export default function (chartProps: IChartProps, drillOptions) {
       {
         type: 'value',
         key: 'yAxisIndex0',
-        min: getDefaultValue(rightMin, 0),
-        max: getDefaultValue(rightMaxValue, 9000),
-        interval: getDefaultValue(rightInterval, 3000),
+        min: rightMin ? rightMin : 0,
+        max: rightMaxValue,
+        interval: rightInterval,
         position: 'right',
         ...getDoubleYAxis(doubleYAxis)
       },
       {
         type: 'value',
         key: 'yAxisIndex1',
-        min: getDefaultValue(leftMin, 0),
-        max: getDefaultValue(leftMaxValue, 9000),
-        interval: getDefaultValue(leftInterval, 3000),
+        min: leftMin ? leftMin : 0,
+        max: leftMaxValue,
+        interval: leftInterval,
         position: 'left',
         ...getDoubleYAxis(doubleYAxis)
       }

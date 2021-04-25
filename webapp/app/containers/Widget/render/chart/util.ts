@@ -214,9 +214,6 @@ export function getMetricAxisOption (
       fontFamily: labelFontFamilyY,
       fontSize: Number(labelFontSizeY),
       formatter: tempFormatter,
-      // TODOS： width和overflow不生效，不知道是不是版本问题，晚点再看看
-      width: 80,
-      overflow: 'break'
     },
     axisLine: {
       show: showLineY,

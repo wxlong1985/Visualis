@@ -320,6 +320,5 @@ export default function (chartProps: IChartProps, drillOptions?: any) {
       xAxisData
     )
   }
-  console.log('options: ', options);
   return options
 }
