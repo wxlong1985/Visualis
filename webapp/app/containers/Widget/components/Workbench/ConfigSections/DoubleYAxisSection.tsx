@@ -169,11 +169,11 @@ export class DoubleYAxisSection extends React.PureComponent<IDoubleYAxisSectionP
           </Row>
 
           <Row gutter={8} type="flex" align="middle" className={styles.blockRow}>
-            <Col span={10}>y轴刻度条数</Col>
+            {/* <Col span={10}>y轴刻度条数</Col> */}
             <Col span={10}>超出后缩放</Col>
-          </Row>
-          <Row gutter={8} type="flex" align="middle" className={styles.blockRow}>
-            <Col span={10}>
+          {/* </Row>
+          <Row gutter={8} type="flex" align="middle" className={styles.blockRow}> */}
+            {/* <Col span={10}>
               <InputNumber
                 placeholder="yAxisSplitNumber"
                 className={styles.blockElm}
@@ -181,7 +181,7 @@ export class DoubleYAxisSection extends React.PureComponent<IDoubleYAxisSectionP
                 min={2}
                 onChange={this.inputNumberChange('yAxisSplitNumber')}
               />
-            </Col>
+            </Col> */}
             <Col span={10}>
               <InputNumber
                 placeholder="dataZoomThreshold"

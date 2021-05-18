@@ -298,6 +298,7 @@ export function metricAxisLabelFormatter (value) {
   } else if (value >= Math.pow(10, 3) && value < Math.pow(10, 6)) {
     return `${precision(value / Math.pow(10, 3))}K`
   } else {
+    if (value < 1 && value > 0 || value > -1 && value < 0) return value.toFixed(2)
     return value
   }
 

@@ -179,7 +179,9 @@ export default function (chartProps: IChartProps, drillOptions) {
   }
 
   const leftInterval = getYaxisInterval(leftMaxValue, (yAxisSplitNumber - 1))
-  const rightInterval = rightMaxValue > 0 ? getYaxisInterval(rightMaxValue, (yAxisSplitNumber - 1)) : leftInterval
+  // 右边根据左边的比例来
+  const rightInterval = rightMaxValue * leftInterval / leftMaxValue
+  // const rightInterval = rightMaxValue > 0 ? getYaxisInterval(rightMaxValue, (yAxisSplitNumber - 1)) : leftInterval
 
   const inverseOption = xAxis.inverse ? { inverse: true } : null
 
@@ -216,6 +218,8 @@ export default function (chartProps: IChartProps, drillOptions) {
         key: 'yAxisIndex0',
         min: rightMin ? rightMin : 0,
         max: rightMaxValue,
+        // 不能直接用这个splitNumber，因为根据echarts的机制，这个分割段数只是个预估值，最后实际显示的段数会在这个基础上根据分割后坐标轴刻度显示的易读程度作调整。
+        // splitNumber: yAxisSplitNumber,
         interval: rightInterval,
         position: 'right',
         ...getDoubleYAxis(doubleYAxis)
