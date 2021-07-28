@@ -107,7 +107,7 @@ export function* getBaseInfo (action) {
   let url = api.projects
   console.log('url: ', url);
   url = url.replace('rest_s', 'rest_j')
-  url = url.replace('visualis', 'dss')
+  url = url.replace('visualis', 'dss/framework/workspace')
   url = url.replace('projects', 'getBaseInfo')
   try {
     const asyncData = yield call(request, url)
