@@ -20,7 +20,7 @@ import org.apache.linkis.protocol.utils.ZuulEntranceUtils
 import org.apache.linkis.scheduler.queue.SchedulerEventState
 import org.apache.linkis.storage.FSFactory
 import org.apache.linkis.storage.resultset.table.{TableMetaData, TableRecord}
-import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
+import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReaderFactory}
 import org.apache.linkis.ujes.client.UJESClient
 import org.apache.linkis.ujes.client.request.JobExecuteAction
 import org.apache.linkis.ujes.client.response.{JobExecuteResult, JobInfoResult}
@@ -151,7 +151,7 @@ class LinkisClientExecutor extends SqlUtils with Logging{
       if(ResultSetFactory.TABLE_TYPE != resultSetModel.resultSetType()){
         throw new VGErrorException(60013,"不支持不是表格的结果集")
       }
-      val reader =ResultSetReader.getResultSetReader(resultSetModel,resultSet)
+      val reader =ResultSetReaderFactory.getResultSetReader(resultSetModel,resultSet)
       val metaData = reader.getMetaData.asInstanceOf[TableMetaData]
       while (reader.hasNext) {
         val record = reader.getRecord.asInstanceOf[TableRecord]
@@ -176,7 +176,7 @@ class LinkisClientExecutor extends SqlUtils with Logging{
       }
       val fs = FSFactory.getFs(resPath)
       fs.init(null)
-      val reader =ResultSetReader.getResultSetReader(resultSetContent,fs.read(resPath))
+      val reader =ResultSetReaderFactory.getResultSetReader(resultSetContent,fs.read(resPath))
       val metaData = reader.getMetaData.asInstanceOf[TableMetaData]
       while (reader.hasNext){
         val record = reader.getRecord.asInstanceOf[TableRecord]
@@ -282,7 +282,7 @@ class LinkisClientExecutor extends SqlUtils with Logging{
     paginateWithQueryColumns.setResultList(resultList)
     paginateWithQueryColumns.setTotalCount(resultList.size())
     val columns = ResultHelper.getResultType(VisualisUtils.getResultSetPath(jobInfo))
-    paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.typeName)).toList)
+    paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.getTypeName)).toList)
     return paginateWithQueryColumns
   }
 
@@ -295,7 +295,7 @@ class LinkisClientExecutor extends SqlUtils with Logging{
     paginateWithQueryColumns.setTotalCount(resultList.size())
 
     val columns = ResultHelper.getResultType(VisualisUtils.getResultSetPath(jobInfo))
-    paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.typeName)).toList)
+    paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.getTypeName)).toList)
     return paginateWithQueryColumns
   }
 
@@ -319,7 +319,7 @@ class LinkisClientExecutor extends SqlUtils with Logging{
     val jobExecuteResult = querySQLWithJobExecuteResult(sql, 2)
     val jobInfo = linkisClient.getJobInfo(jobExecuteResult)
     val columns = ResultHelper.getResultType(VisualisUtils.getResultSetPath(jobInfo))
-    columns.map(col => new QueryColumn(col.columnName,col.dataType.typeName)).toList
+    columns.map(col => new QueryColumn(col.columnName,col.dataType.getTypeName)).toList
   }
 
   override def testConnection(): Boolean = super.testConnection()

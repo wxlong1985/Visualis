@@ -21,7 +21,7 @@ import org.apache.linkis.server.JMap
 import org.apache.linkis.server.security.SecurityFilter
 import org.apache.linkis.storage.FSFactory
 import org.apache.linkis.storage.resultset.table.{TableMetaData, TableRecord}
-import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
+import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReaderFactory}
 import edp.core.exception.{ServerException, SourceException}
 import edp.core.model._
 import edp.core.utils.SqlUtils
@@ -156,7 +156,7 @@ class SparkEntranceExecutor extends SqlUtils with Logging{
       if(ResultSetFactory.TABLE_TYPE != resultSetModel.resultSetType()){
         throw new VGErrorException(60013,"不支持不是表格的结果集")
       }
-      val reader =ResultSetReader.getResultSetReader(resultSetModel,resultSet)
+      val reader =ResultSetReaderFactory.getResultSetReader(resultSetModel,resultSet)
       val metaData = reader.getMetaData.asInstanceOf[TableMetaData]
       while (reader.hasNext) {
         val record = reader.getRecord.asInstanceOf[TableRecord]
@@ -181,7 +181,7 @@ class SparkEntranceExecutor extends SqlUtils with Logging{
       }
       val fs = FSFactory.getFs(resPath)
       fs.init(null)
-      val reader =ResultSetReader.getResultSetReader(resultSetContent,fs.read(resPath))
+      val reader =ResultSetReaderFactory.getResultSetReader(resultSetContent,fs.read(resPath))
       val metaData = reader.getMetaData.asInstanceOf[TableMetaData]
       while (reader.hasNext){
         val record = reader.getRecord.asInstanceOf[TableRecord]
@@ -345,7 +345,7 @@ class SparkEntranceExecutor extends SqlUtils with Logging{
             paginateWithQueryColumns.setResultList(resultList)
             paginateWithQueryColumns.setTotalCount(resultList.size())
             val columns = ResultHelper.getResultType(resultSets(resultSets.length - 1))
-            paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.typeName)).toList)
+            paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.getTypeName)).toList)
           }
           return paginateWithQueryColumns;
         case _ =>
@@ -362,7 +362,7 @@ class SparkEntranceExecutor extends SqlUtils with Logging{
       paginateWithQueryColumns.setResultList(resultList)
       paginateWithQueryColumns.setTotalCount(resultList.size())
       val columns = ResultHelper.getResultType(task.getResultLocation + VisualisUtils.RESULT_FILE_NAME.getValue)
-      paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.typeName)).toList)
+      paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.getTypeName)).toList)
       return paginateWithQueryColumns
     }
   }
@@ -379,7 +379,7 @@ class SparkEntranceExecutor extends SqlUtils with Logging{
       paginateWithQueryColumns.setResultList(resultList)
       paginateWithQueryColumns.setTotalCount(resultList.size())
       val columns = ResultHelper.getResultType(resultSets(resultSets.length - 1))
-      paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.typeName)).toList)
+      paginateWithQueryColumns.setColumns(columns.map(col => new QueryColumn(col.columnName,col.dataType.getTypeName)).toList)
     }
     return  paginateWithQueryColumns;
   }
@@ -404,7 +404,7 @@ class SparkEntranceExecutor extends SqlUtils with Logging{
     val resultSets = querySQLWithResultSetPaths(sql, 2)
     if(resultSets.isEmpty) null else {
       val columns = ResultHelper.getResultType(resultSets(resultSets.length - 1))
-      columns.map(col => new QueryColumn(col.columnName,col.dataType.typeName)).toList
+      columns.map(col => new QueryColumn(col.columnName,col.dataType.getTypeName)).toList
     }
   }
 

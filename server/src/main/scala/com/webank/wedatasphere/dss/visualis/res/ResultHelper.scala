@@ -4,7 +4,7 @@ import java.util
 import com.webank.wedatasphere.dss.visualis.configuration.CommonConfig
 import org.apache.linkis.storage.domain._
 import org.apache.linkis.storage.resultset.table.TableMetaData
-import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
+import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReaderFactory}
 import com.webank.wedatasphere.dss.visualis.exception.VGErrorException
 import org.apache.linkis.adapt.LinkisUtils
 import org.apache.linkis.common.io.FsPath
@@ -46,7 +46,7 @@ object ResultHelper {
     }
     val fs = FSFactory.getFs(resPath)
     fs.init(null)
-    val reader = ResultSetReader.getResultSetReader(resultSet,fs.read(resPath))
+    val reader = ResultSetReaderFactory.getResultSetReader(resultSet,fs.read(resPath))
     val metaData = reader.getMetaData.asInstanceOf[TableMetaData]
     Utils.tryQuietly(reader.close())
     Utils.tryQuietly(fs.close())
@@ -59,7 +59,7 @@ object ResultHelper {
     columns.foreach{column =>
       val visualType = toVisualType(column.dataType)
       val modelType = if(visualType != NUMBER_TYPE) "category" else "value"
-      val modelItem = ModelItem(column.dataType.typeName.toUpperCase,visualType,modelType)
+      val modelItem = ModelItem(column.dataType.getTypeName.toUpperCase,visualType,modelType)
       res.put(column.columnName,modelItem)
     }
     LinkisUtils.gson.toJson(res)
@@ -68,8 +68,8 @@ object ResultHelper {
   val NUMBER_TYPE = "number"
 
   def toVisualType(dataType: DataType): String = dataType match {
-    case ShortIntType | IntType | LongType | FloatType | DoubleType | DecimalType | BinaryType => NUMBER_TYPE
-    case DateType | TimestampType => "date"
+    case DataType.ShortIntType | DataType.IntType | DataType.LongType | DataType.FloatType | DataType.DoubleType | DataType.DecimalType | DataType.BinaryType => NUMBER_TYPE
+    case DataType.DateType | DataType.TimestampType => "date"
     case _ => "string"
   }
 
